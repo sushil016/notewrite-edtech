@@ -1,9 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Navbar from "./Navbar";
 import { TypewriterEffectSmooth } from "./ui/typewriter-effect";
+import { FaInstagram, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 
 export function TypewriteEffect() {
+
+  const navigate = useRouter()
   const words = [
     {
       text: "Engineering",
@@ -25,7 +29,7 @@ export function TypewriteEffect() {
   return (
     <>
     
-    <div className="flex flex-col items-center mt-24 h-[30rem]  ">
+    <div className="flex flex-col items-center mt-32 h-[17rem]  ">
     
         <p className="text-neutral-400 dark:text-neutral-100 text-xl sm:text-base  ">
           HELLO! I am Sushil
@@ -35,10 +39,22 @@ export function TypewriteEffect() {
           {/* <button className="w-40 h-10 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm">
             Join now
           </button> */}
-          <button className="w-40 h-10 rounded-xl bg-white text-black border border-black  text-sm">
+          <button onClick={()=> navigate.push('/signup')} className="w-40 h-10 rounded-xl bg-white text-black border border-black  text-sm hover:scale-105 translate transform duration-150 hover:opacity-95">
             Get Started ->
           </button>
+          
         </div>
+        <div className="mt-24 gap-4">
+        <button onClick={()=>{navigate.push('https://x.com/Sushil_Sahani37?t=zyiO3kvkcvORJMSkmqI45g&s=09')}} className=" hover:scale-150 duration-300 px-4">
+        <FaXTwitter />
+        </button>
+        
+        <button onClick={()=>{navigate.push('https://www.instagram.com/sushil______16?igsh=MW52cTl1ZTlvODk1dw==')}} className="hover:scale-150 duration-300"><FaInstagram /></button>
+        <button onClick={()=>{navigate.push('https://www.linkedin.com/in/sushil-sahani-46235527b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app')}} className=" hover:scale-150 duration-300 px-4">
+        <FaLinkedin />
+        </button>
+        </div>
+
       </div></>
   );
 }
