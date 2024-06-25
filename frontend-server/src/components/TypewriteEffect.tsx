@@ -25,7 +25,7 @@ export function TypewriteEffect() {
   return (
     <>
     
-    <div className="flex flex-col items-center justify-center h-[40rem]  ">
+    <div className="flex flex-col items-center mt-24 h-[30rem]  ">
     
         <p className="text-neutral-400 dark:text-neutral-100 text-xl sm:text-base  ">
           HELLO! I am Sushil
@@ -36,7 +36,7 @@ export function TypewriteEffect() {
             Join now
           </button> */}
           <button className="w-40 h-10 rounded-xl bg-white text-black border border-black  text-sm">
-            Get Started
+            Get Started ->
           </button>
         </div>
       </div></>
