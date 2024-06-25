@@ -29,7 +29,7 @@ const router = useRouter()
         <button className='w-32 h-8 text-zinc-300 hover:text-blue-400    hover:scale-105 translate transform duration-150'>services
           </button>
           <button className='w-32 h-8 text-zinc-300 hover:text-blue-400 hover:scale-105 translate transform duration-150' >Projects</button>
-          <button className='w-32 h-8 text-zinc-300 hover:text-blue-400 hover:scale-105 translate transform duration-150'>Contact us</button>
+          <button onClick={()=>{router.push("/contact")}} className='w-32 h-8 text-zinc-300 hover:text-blue-400 hover:scale-105 translate transform duration-150'>Contact us</button>
       </div>
 
       <Link href="/login" className="w-32 h-10 rounded-xl bg-blue-400 text-black border items-center flex justify-center border-black  text-sm hover:opacity-90 hover:bg-blue-300 duration-300">
