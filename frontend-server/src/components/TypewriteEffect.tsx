@@ -29,17 +29,14 @@ export function TypewriteEffect() {
   return (
     <>
     
-    <div className="flex flex-col items-center mt-32 h-[17rem]  ">
+    <div className="flex flex-col items-center h-[30rem]  ">
     
-        <p className="text-neutral-400 dark:text-neutral-100 text-xl sm:text-base  ">
+        <p className="text-neutral-400 dark:text-neutral-100 text-xl sm:text-base mt-[11rem] ">
           HELLO! I am Sushil
         </p>
         <TypewriterEffectSmooth words={words} />
         <div className="flex flex-col md:flex-row space-y-16 md:space-y-0 space-x-0 md:space-x-4">
-          {/* <button className="w-40 h-10 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm">
-            Join now
-          </button> */}
-          <button onClick={()=> navigate.push('/signup')} className="w-40 h-10 rounded-xl bg-white text-black border border-black  text-sm hover:scale-105 translate transform duration-150 hover:opacity-95">
+          <button onClick={()=> navigate.push('/signup')} className="w-40 h-10 rounded-xl bg-white text-black border border-black  text-sm hover:scale-105 translate transform duration-150 hover:opacity-95 relative">
             Get Started ->
           </button>
           

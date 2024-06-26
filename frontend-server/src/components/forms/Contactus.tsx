@@ -13,7 +13,6 @@ import { FaLocationDot } from "react-icons/fa6";
 const Contactus = () => {
   return (
     <>
-    <Navbar/>
     <main className="w-full h-auto mt-6 flex">
       <div className=" w-4/6 flex items-center  justify-end">
         <div className="bg-black flex flex-col w-[400px] h-[400px] rounded-lg p-8 gap-8">

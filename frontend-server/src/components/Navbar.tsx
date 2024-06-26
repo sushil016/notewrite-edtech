@@ -22,7 +22,7 @@ const Navbar = () => {
 const router = useRouter()
 
   return (
-    <div ref={gsapRef} className=' text-white flex justify-evenly gap-6 p-4 backdrop-blur-sm'>
+    <div ref={gsapRef} className=' text-white w-full h-[] flex justify-evenly gap-6 p-4 backdrop-blur-sm border-b-1 drop-shadow-lg shadow-lg shadow-zinc-100/10 fixed'>
       <button onClick={()=> router.push('/')} className='text-3xl text-blue-400 font-semibold hover:opacity-80 drop-shadow-2xl duration-200'>NoteWrite</button>
 
       <div className='flex gap-8'>
