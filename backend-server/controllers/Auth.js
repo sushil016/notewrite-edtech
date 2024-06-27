@@ -1,12 +1,18 @@
 const user = require("../models/user");
 const OTP = require("../models/OTP");
-const { findOne } = require("../models/course");
+const otpGenerator = require('otp-generator');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const profile = require("../models/profile");
+const mailSender = require("../utils/nodeMailer");
+const passwordUpdate = require("../mail/template/passwordUpdate")
+require("dotenv").config();
 
 exports.sendOTP = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const excitingUser = await findOne({ email });
+    const excitingUser = await user.findOne({ email });
     if (excitingUser) {
       return res.status(400).json({
         success: false,
@@ -103,13 +109,15 @@ exports.signup = async (req, res) => {
       return res.status(500).json({
         message: "please fill otp",
       });
-    } else if (recentOTP.otp !== otp) {
+    } 
+    
+    else if (recentOTP[0].otp !== otp) {
       return res.status(500).json({
         message: "invalid otp",
       });
     }
 
-    const hashedPassword = await bcrypy.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const userProfile = await profile.create({
       gender: null,
@@ -122,7 +130,7 @@ exports.signup = async (req, res) => {
       LastName,
       email,
       password: hashedPassword,
-      accountType,
+      accountType:accountType,
       contactNumber,
       Profile: userProfile._id,
     });
