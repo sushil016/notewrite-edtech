@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { LabelInputContainer } from "../inputContainer/InputConatiner";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -11,6 +11,17 @@ import { IoCall, IoChatbubblesSharp } from "react-icons/io5";
 import { FaLocationDot } from "react-icons/fa6";
 
 const Contactus = () => {
+
+   const [firstName , setFirstName ] = useState("");
+   const [lastName , setLastName ] = useState("");
+   const [email , setEmail] = useState("");
+   const [phoneNumber , setPhoneNumber] = useState("");
+   const [message , setMessage ] = useState("");
+
+   function SubmiContactUsHandler(){
+    
+   }
+   
   return (
     <>
       <main className="w-full h-auto flex">
@@ -77,17 +88,19 @@ const Contactus = () => {
               Fell free to mail us if you are finding any dificulties
             </p>
 
+            <form onSubmit={SubmiContactUsHandler}>
             <LabelInputContainer className="mt-6">
               <Label htmlFor="firstname">First Name</Label>
-              <Input id="firstname" placeholder="Firstname" type="text" />
+              <Input onChange={ (e)=>{setFirstName(e.target.value)}} id="firstname" placeholder="Firstname" type="text" />
             </LabelInputContainer>
             <LabelInputContainer className="mt-2">
-              <Label htmlFor="lastname">Last Name</Label>
+              <Label onChange={ (e)=>{setLastName(e.target.value)}} htmlFor="lastname">Last Name</Label>
               <Input id="lastname" placeholder="Lastname" type="text" />
             </LabelInputContainer>
             <LabelInputContainer className="mt-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
+                onChange={ (e)=>{setEmail(e.target.value)}}
                 id="email"
                 placeholder="notewrite.bvcoenm@gmail.com"
                 type="email"
@@ -97,6 +110,7 @@ const Contactus = () => {
             <LabelInputContainer className="mt-2">
               <Label htmlFor="PhoneNumber">Phone Number</Label>
               <Input
+              onChange={ (e)=>{setPhoneNumber(e.target.value)}}
                 id="phoneNumber"
                 placeholder="Enter your Mobile Number"
                 type="Number"
@@ -106,6 +120,7 @@ const Contactus = () => {
             <LabelInputContainer className="mt-2">
               <Label htmlFor="message">Write your message</Label>
               <textarea
+              onChange={(e)=>{setMessage(e.target.value)}}
                 className="rounded-lg bg-zinc-800 p-2"
                 name="message"
                 id="message"
@@ -119,6 +134,7 @@ const Contactus = () => {
               Submit your message &rarr;
               <BottomGradient />
             </button>
+            </form>
           </div>
         </div>
       </main>

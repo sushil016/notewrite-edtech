@@ -1,11 +1,15 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { BottomGradient } from "./effects/BotttomGradient";
 import { LabelInputContainer } from "./inputContainer/InputConatiner";
 
 export function LoginForm() {
+
+   const [firstName , setFirstName ] = useState("")
+   const [password , setPassword ] = useState("")
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted");
@@ -24,6 +28,7 @@ export function LoginForm() {
           <LabelInputContainer className="mb-4">
             <Label htmlFor="email">Email Address</Label>
             <Input
+              onChange={ (e) => {setFirstName(e.target.value)}}
               id="email"
               placeholder="notewrite.bvcoenm@gmail.com"
               type="email"
@@ -31,7 +36,11 @@ export function LoginForm() {
           </LabelInputContainer>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" placeholder="••••••••" type="password" />
+            <Input 
+            onChange={ (e) => {setPassword(e.target.value)}}
+            id="password"
+            placeholder="••••••••" 
+            type="password" />
           </LabelInputContainer>
 
           <button

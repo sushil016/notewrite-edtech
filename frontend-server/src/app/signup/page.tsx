@@ -36,7 +36,7 @@ const page = () => {
         </div>
         {/* <div ref={scrollRef} className="font-bold text-[10rem] rotate-90  flex justify-end ">SCROLL</div> */}
       </div>
-      <div className="absolute text-black font-semibold"> <Signup ref={signupFormRef}/></div>
+      <div className="absolute text-black font-semibold mt-32"> <Signup ref={signupFormRef}/></div>
     </div>
   );
 };
