@@ -69,7 +69,7 @@ exports.isStudent = (req, res, next) => {
   }
 };
 
-exports.isteacher = (req, rex, next) => {
+exports.isTeacher = (req, rex, next) => {
   try {
     if (req.user.accountType !== Teacher) {
       return res.status(500).json({

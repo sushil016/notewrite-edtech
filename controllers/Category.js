@@ -1,7 +1,7 @@
 const category = require("../models/category");
 
 
-exports.createTags = async (req,res)=>{
+exports.createCategory = async (req,res)=>{
     try {
         const {name , description} = req.body;
 
@@ -19,7 +19,7 @@ exports.createTags = async (req,res)=>{
 
         return res.status(200).json({
             success:true,
-            message:"tag created successfully"
+            message:"category created successfully"
         })
 
     } catch (error) {

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-exports.userSchema = new mongooseSchema({
+const userSchema = new mongoose.Schema({
     FirstName:{
         type: String,
         Required: true,
@@ -23,11 +23,11 @@ exports.userSchema = new mongooseSchema({
         type: String,
         Required: true
     },
-    // confirmPassword:{
-    //     type: String,
-    //     Required: true
-    // },
-    coures:[{
+    confirmPassword:{
+        type: String,
+        Required: true
+    },
+    course:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"course"
     }],
