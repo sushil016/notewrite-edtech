@@ -5,8 +5,10 @@ import { Providers } from "./providers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
+import { Roboto } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
+const roboto = Roboto( {weight: '300', subsets: ['latin']})
 
 export const metadata: Metadata = {
   title: "NoteWrite",
@@ -20,10 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={roboto.className}>
         <SmoothScroll>
           <Providers>
-            <Navbar />
+            <Navbar/>
             {children}
             <Footer />
           </Providers>
