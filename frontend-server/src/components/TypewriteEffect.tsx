@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "./Navbar";
 import { TypewriterEffectSmooth } from "./ui/typewriter-effect";
 import { FaInstagram, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { StylisButton } from "./buttons/StylisButton";
 
 export function TypewriteEffect() {
 
@@ -35,11 +36,10 @@ export function TypewriteEffect() {
           HELLO! I am Sushil
         </p>
         <TypewriterEffectSmooth words={words} />
-        <div className="flex flex-col md:flex-row space-y-16 md:space-y-0 space-x-0 md:space-x-4">
-          <button onClick={()=> navigate.push('/signup')} className="w-40 h-10 rounded-xl bg-white text-black border border-black  text-sm hover:scale-105 translate transform duration-150 hover:opacity-95 relative">
-            Get Started ->
-          </button>
+      
+        <div className="flex flex-col md:flex-row space-y-16 md:space-y-0 space-x-0 md:space-x-4 ">
           
+          <button onClick={()=> navigate.push('/signup')} > <StylisButton/></button>
         </div>
         <div className="mt-24 gap-4">
         <button onClick={()=>{navigate.push('https://x.com/Sushil_Sahani37?t=zyiO3kvkcvORJMSkmqI45g&s=09')}} className=" hover:scale-150 duration-300 px-4">

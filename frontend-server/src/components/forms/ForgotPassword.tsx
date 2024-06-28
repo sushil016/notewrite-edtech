@@ -6,7 +6,7 @@ import { LabelInputContainer } from '../inputContainer/InputConatiner'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import Otpbutton from '../cards/Otpbutton'
-import Button from '../Button'
+import Button from '../buttons/Button'
 import Line from '../effects/Line'
 
 const ForgotPassword = () => {

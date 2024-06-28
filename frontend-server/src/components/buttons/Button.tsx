@@ -1,5 +1,5 @@
 import React from 'react'
-import { BottomGradient } from './effects/BotttomGradient'
+import { BottomGradient } from '../effects/BotttomGradient'
 
 const Button = ( {value} ) => {
   return (

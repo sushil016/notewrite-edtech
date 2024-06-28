@@ -27,7 +27,7 @@ export function Signup() {
     console.log("Form submitted");
   };
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-2 md:p-8  backdrop-blur-sm shadow-lg shadow-zinc-100/10 drop-shadow-xs">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-2 md:p-8  backdrop-blur-sm shadow-lg shadow-zinc-100/10 drop-shadow-xs relative">
       <Heading value={'Welcome to NoteWrite'}/>
       <SubHeading value={' Enter your Credentials to create your account!'}/>
 

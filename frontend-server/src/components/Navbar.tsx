@@ -5,6 +5,7 @@ import {gsap} from 'gsap'
 import { useGSAP } from '@gsap/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { MovingButton } from './ui/moving-border'
 
 const Navbar = () => {
 
@@ -32,8 +33,9 @@ const router = useRouter()
           <button onClick={()=>{router.push("/contact")}} className='w-32 h-8 text-zinc-300 hover:text-blue-400 hover:scale-105 translate transform duration-150'>Contact us</button>
       </div>
 
-      <Link href="/login" className="w-32 h-10 rounded-xl bg-blue-400 text-black border items-center flex justify-center border-black  text-sm hover:opacity-90 hover:bg-blue-300 duration-300">
-            Sign in &rarr;
+      <Link href="/login" > <MovingButton 
+      borderRadius="1rem"
+      className='bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800'>Sign in</MovingButton>
           </Link>
     </div>
   )
