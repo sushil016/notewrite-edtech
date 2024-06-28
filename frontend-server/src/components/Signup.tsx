@@ -10,6 +10,8 @@ import { cn } from "./utils/cn";
 import { LabelInputContainer } from "./inputContainer/InputConatiner";
 import { BottomGradient } from "./effects/BotttomGradient";
 import { useState } from "react";
+import Heading from "./headersComponent/Heading";
+import SubHeading from "./headersComponent/SubHeading";
 
 export function Signup() {
     const [firstName, setFirstName] = useState("")
@@ -26,12 +28,8 @@ export function Signup() {
   };
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-2 md:p-8  backdrop-blur-sm shadow-lg shadow-zinc-100/10 drop-shadow-xs">
-      <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200 items-center justify-center flex">
-        Welcome to NoteWrite
-      </h2>
-      <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300 flex justify-center">
-        Enter your Credentials to create your account!
-      </p>
+      <Heading value={'Welcome to NoteWrite'}/>
+      <SubHeading value={' Enter your Credentials to create your account!'}/>
 
       <form className="my-8" onSubmit={handleSubmit}>
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">

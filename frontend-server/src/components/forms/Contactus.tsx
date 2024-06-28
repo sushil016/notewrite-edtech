@@ -80,7 +80,7 @@ const Contactus = () => {
         </div>
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent h-screen w-[1px] ml-32" />
         <div className="flex justify-center items-center w-full mt-24">
-          <div className="bg-black px-28 p-4 rounded-lg">
+          <div className="bg-black  p-8 rounded-lg w-[530px]">
             <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200 items-center justify-center flex">
               Contact us
             </h2>

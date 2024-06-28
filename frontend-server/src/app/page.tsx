@@ -1,4 +1,5 @@
 "use client"
+import { BottomGradient } from "@/components/effects/BotttomGradient";
 import Line from "@/components/effects/Line";
 import Navbar from "@/components/Navbar";
 import { TypewriteEffect } from "@/components/TypewriteEffect";
@@ -27,6 +28,7 @@ export default function Home() {
 
       <div className="w-full h-screen bg-slate-800">hii</div>
       <div className="w-full h-screen bg-slate-500">hii</div>
+      <BottomGradient/>
     </div>
   );
 }

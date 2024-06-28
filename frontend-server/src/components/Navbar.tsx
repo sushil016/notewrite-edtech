@@ -33,7 +33,7 @@ const router = useRouter()
       </div>
 
       <Link href="/login" className="w-32 h-10 rounded-xl bg-blue-400 text-black border items-center flex justify-center border-black  text-sm hover:opacity-90 hover:bg-blue-300 duration-300">
-            Sign in ->
+            Sign in &rarr;
           </Link>
     </div>
   )
