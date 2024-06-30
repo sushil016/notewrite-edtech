@@ -3,21 +3,26 @@ import { BottomGradient } from "@/components/effects/BotttomGradient";
 import Line from "@/components/effects/Line";
 import Navbar from "@/components/Navbar";
 import { TypewriteEffect } from "@/components/TypewriteEffect";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/all";
 import { useEffect } from "react";
 
 export default function Home() {
 
-  // useEffect( ()=>{
-  //   (
-  //     async ()=>{
-  //       const LocomotiveScroll = (await import('locomotive-scroll')).default
-  //       const locomotiveScroll = new LocomotiveScroll();
-  //     }
-  //   )()
-  // },[])
+    if (typeof window !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+
+    useGSAP(
+      ()=>{
+        
+      }
+    )
+
   return (
     <div>
-      <div className="w-full  z-50">{/* <Navbar/> */}</div>
+      <div className="w-full">{/* <Navbar/> */}</div>
       {/* <div><WavyBackgroundDemo/></div> */}
 
       <div className=" w-full ">
@@ -28,7 +33,7 @@ export default function Home() {
 
       <div className="w-full h-screen bg-slate-800">hii</div>
       <div className="w-full h-screen bg-slate-500">hii</div>
-      <BottomGradient/>
+      
     </div>
   );
 }
