@@ -100,7 +100,7 @@ const Footer = () => {
         <div className="w-full h-[5vh] bg-zinc-950 flex justify-center items-center gap-3">
           <p className="text-white">Copyright © 2024</p>
           <h2>Starting NoteWrite </h2>
-          <span>By @sushil_sahani</span>
+          <span>By @sushil.sahani</span>
         </div>
       </main>
     </>
