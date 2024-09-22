@@ -28,7 +28,7 @@ export function Signup() {
   };
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-2 md:p-8  backdrop-blur-sm shadow-lg shadow-zinc-100/10 drop-shadow-xs relative">
-      <Heading value={'Welcome to NoteWrite'}/>
+      <Heading value={'Welcome to Robonauts'}/>
       <SubHeading value={' Enter your Credentials to create your account!'}/>
 
       <form className="my-8" onSubmit={handleSubmit}>

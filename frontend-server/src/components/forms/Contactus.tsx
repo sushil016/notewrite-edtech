@@ -54,7 +54,7 @@ const Contactus = () => {
               </div>
               <div className="flex flex-col ml-2">
                 <p className="text-neutral-600 text-sm max-w-sm mt-1 dark:text-neutral-300">
-                  Come and say hello at our office HQ.
+                  Come and say hello at our Club HQ.
                 </p>
                 <h2 className="font-semibold text-sm text-zinc-400">
                   Bharati Vidyapeeth College of Engineering, Navi Mumbai

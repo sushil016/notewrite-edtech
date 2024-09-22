@@ -19,7 +19,7 @@ const Footer = () => {
         <div className="w-full h-[60vh] flex">
           <div className="w-[30vw]  h-full flex justify-center  flex-col">
             {" "}
-            <p className="text-3xl ml-[138px]">@NoteWrite</p>
+            <p className="text-3xl ml-[138px]">@Robonauts</p>
             <span className="ml-20">
               <SubHeading
                 value={"An Edtech platform for Engineering college"}

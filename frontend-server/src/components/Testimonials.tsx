@@ -6,12 +6,12 @@ const Testimonials = () => {
   return (
     <main className='w-full h-screen'>
         <div>
-          <Image
+          {/* <Image
           src="https://ideogram.ai/assets/progressive-image/balanced/response/eYQrmLftQm2WRzcTyhK97Q"
           alt="teacher kudos"
           width={500}
           height={500}
-          />
+          /> */}
         </div>
     </main>
   )

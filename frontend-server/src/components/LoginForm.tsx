@@ -23,7 +23,7 @@ export function LoginForm() {
     <main className="flex justify-center items-center ">
       <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black mt-40">
         
-        <Heading value={'Welcome to NoteWrite'}/>
+        <Heading value={'Welcome to Robonauts'}/>
         <SubHeading value={'Enter your Credentials to Access Your account'}/>
 
         <form className="my-8" onSubmit={handleSubmit}>
