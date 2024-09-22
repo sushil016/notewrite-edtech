@@ -39,7 +39,7 @@ export function TypewriteEffect() {
             <StylisButton />
           </div>
         </div>
-        <div className="mt-24 gap-4">
+        <div className="mt-24 gap-8">
           <button
             onClick={() => {
               navigate.push(
@@ -57,7 +57,7 @@ export function TypewriteEffect() {
                 "https://www.instagram.com/sushil______16?igsh=MW52cTl1ZTlvODk1dw=="
               );
             }}
-            className="hover:scale-150 duration-300"
+            className="hover:scale-150 duration-300 px-4"
           >
             <FaInstagram />
           </button>
