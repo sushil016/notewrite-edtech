@@ -4,6 +4,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
 import { Source_Code_Pro } from "next/font/google";
 import { useGSAP } from "@gsap/react";
+import { TopCoursesSection } from './courses/TopCoursesSection';
+import { ListedCoursesSection } from '@/components/courses/ListedCoursesSection';
+import { TestimonialsSection } from '@/components/testimonials/TestimonialsSection';
+import { courses, categories, testimonials } from '../data/mockData';
 
 const codepro = Source_Code_Pro({ weight: "400", subsets: ["latin"] });
 
@@ -54,6 +58,14 @@ const Landing = () => {
           </p>
         </div>
       </div>
+
+      <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+
+      <main>
+      <TopCoursesSection courses={courses} />
+      <ListedCoursesSection courses={courses} categories={categories} />
+      <TestimonialsSection testimonials={testimonials} />
+      </main>
     </div>
   );
 };

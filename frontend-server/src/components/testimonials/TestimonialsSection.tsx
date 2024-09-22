@@ -8,12 +8,12 @@ interface TestimonialsSectionProps {
   testimonials: Testimonial[];
 }
 
-export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials }) => {
+export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials = [] }) => {
   const [isHovered, setIsHovered] = useState(false);
   const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const scrollWidth = testimonials.length * 320; // Adjust based on your card width
+  const scrollWidth = (testimonials?.length || 0) * 320; // Adjust based on your card width
 
   useEffect(() => {
     controls.start({
@@ -47,8 +47,19 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
     }
   }, [isHovered, controls, scrollWidth]);
 
+  if (testimonials.length === 0) {
+    return (
+      <section className="py-12 bg-gray-900 text-gray-100">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-blue-300">What Our Students Say</h2>
+          <p>No testimonials available at the moment.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="py-12 bg-gray-900 text-gray-100 overflow-hidden">
+    <section className="py-12  text-gray-100 overflow-hidden">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-8 text-blue-300">What Our Students Say</h2>
         <div

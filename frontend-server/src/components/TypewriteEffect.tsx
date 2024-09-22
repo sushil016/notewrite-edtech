@@ -35,10 +35,9 @@ export function TypewriteEffect() {
         <TypewriterEffectSmooth words={words} />
 
         <div className="flex flex-col md:flex-row space-y-16 md:space-y-0 space-x-0 md:space-x-4 ">
-          <button >
-            {" "}
+          <div>
             <StylisButton />
-          </button>
+          </div>
         </div>
         <div className="mt-24 gap-4">
           <button

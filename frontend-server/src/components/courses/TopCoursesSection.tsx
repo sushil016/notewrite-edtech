@@ -12,6 +12,18 @@ interface TopCoursesSectionProps {
 export const TopCoursesSection: React.FC<TopCoursesSectionProps> = ({ courses }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Add a check for courses
+  if (!courses || courses.length === 0) {
+    return (
+      <section className="py-12 bg-zinc-950 text-gray-100">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-8">Top Courses</h2>
+          <p className="text-center text-gray-600">No courses available at the moment.</p>
+        </div>
+      </section>
+    );
+  }
+
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % courses.length);
   };
@@ -21,15 +33,15 @@ export const TopCoursesSection: React.FC<TopCoursesSectionProps> = ({ courses })
   };
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-12 bg-zinc-90 text-gray-100 z-10">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8">Top Courses</h2>
+        <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">Top Documantation</h2>
         <div className="relative">
           <div className="flex overflow-hidden">
             {courses.map((course, index) => (
               <motion.div
                 key={course.id}
-                className="w-full flex-shrink-0"
+                className="w-2/3 flex-shrink-0 sm:w-3/4 sm:ml-48 p-4 "
                 initial={{ opacity: 0, x: '100%' }}
                 animate={{
                   opacity: index === currentIndex ? 1 : 0,

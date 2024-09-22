@@ -8,7 +8,7 @@ interface TestimonialCardProps {
 
 export const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial }) => (
   <div className="w-80 flex-shrink-0 mx-2">
-    <div className="bg-gray-800 rounded-lg shadow-lg p-6 h-full flex flex-col justify-between">
+    <div className="bg-zinc-950 rounded-lg shadow-lg p-6 h-full flex flex-col justify-between">
       <div>
         <div className="flex items-center mb-4">
           <Image

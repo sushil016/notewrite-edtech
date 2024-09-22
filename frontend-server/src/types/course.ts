@@ -4,7 +4,7 @@ export interface Instructor {
   }
   
   export interface Course {
-    id: number;
+    id: string;
     title: string;
     description: string;
     instructor: Instructor;
@@ -16,4 +16,3 @@ export interface Instructor {
     price: number;
     category: string;
   }
-  

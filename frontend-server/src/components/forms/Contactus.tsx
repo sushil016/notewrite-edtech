@@ -94,8 +94,13 @@ const Contactus = () => {
               <Input onChange={ (e)=>{setFirstName(e.target.value)}} id="firstname" placeholder="Firstname" type="text" />
             </LabelInputContainer>
             <LabelInputContainer className="mt-2">
-              <Label onChange={ (e)=>{setLastName(e.target.value)}} htmlFor="lastname">Last Name</Label>
-              <Input id="lastname" placeholder="Lastname" type="text" />
+              <Label htmlFor="lastname">Last Name</Label>
+              <Input
+                id="lastname"
+                placeholder="Lastname"
+                type="text"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
+              />
             </LabelInputContainer>
             <LabelInputContainer className="mt-2">
               <Label htmlFor="email">Email Address</Label>

@@ -9,7 +9,7 @@ import { MovingButton } from './ui/moving-border'
 
 const Navbar = () => {
 
-  const gsapRef = useRef();
+  const gsapRef = useRef<HTMLDivElement>(null);
 
   useGSAP(()=>{
     gsap.from(gsapRef.current ,{
@@ -23,7 +23,7 @@ const Navbar = () => {
 const router = useRouter()
 
   return (
-    <div ref={gsapRef} className= ' text-white w-full h-[] flex justify-evenly gap-6 p-4 backdrop-blur-sm border-b-1 drop-shadow-lg shadow-lg shadow-zinc-100/10 fixed'>
+    <div ref={gsapRef} className= ' text-white w-full h-[] flex justify-evenly gap-6 p-4 backdrop-blur-sm border-b-1 drop-shadow-lg shadow-lg shadow-zinc-100/10 fixed z-50'>
       <button onClick={()=> router.push('/')} className='text-3xl text-blue-400 font-semibold hover:opacity-80 drop-shadow-2xl duration-200'>Robonauts</button>
 
       <div className='flex gap-8'>

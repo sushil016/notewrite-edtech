@@ -18,7 +18,7 @@ interface ListedCoursesSectionProps {
 export const ListedCoursesSection: React.FC<ListedCoursesSectionProps> = ({ courses, categories }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [expandedCourse, setExpandedCourse] = useState<number | null>(null);
+  const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
   const sectionRef = useRef(null);
   const controls = useAnimation();
 
@@ -29,27 +29,29 @@ export const ListedCoursesSection: React.FC<ListedCoursesSectionProps> = ({ cour
 
   useEffect(() => {
     const section = sectionRef.current;
-    gsap.fromTo(
-      section.querySelectorAll('.course-card'),
-      { y: 50, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: section,
-          start: "top 80%",
-        },
-      }
-    );
+    if (section) {
+      gsap.fromTo(
+        section.querySelectorAll('.course-card'),
+        { y: 50, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: 0.1,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 80%",
+          },
+        }
+      );
+    }
   }, [filteredCourses]);
 
   return (
-    <section ref={sectionRef} className="py-12 bg-gray-900 text-gray-100">
+    <section ref={sectionRef} className="py-12  text-gray-100">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8 text-blue-300">Explore Our Courses</h2>
+        <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">Explore Our Documentation</h2>
         <motion.div
           className="flex flex-col items-center mb-8"
           initial={{ opacity: 0, y: -20 }}
@@ -63,7 +65,7 @@ export const ListedCoursesSection: React.FC<ListedCoursesSectionProps> = ({ cour
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`m-1 ${
-                  selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  selectedCategory === category ? 'bg-blue-500 text-white' : 'bg-zinc-900 text-gray-300 hover:bg-zinc-700'
                 }`}
               >
                 {category}
@@ -71,7 +73,7 @@ export const ListedCoursesSection: React.FC<ListedCoursesSectionProps> = ({ cour
             ))}
           </div>
         </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-8">
           {filteredCourses.map(course => (
             <CourseCard
               key={course.id}

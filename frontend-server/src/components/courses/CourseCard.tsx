@@ -12,10 +12,16 @@ interface CourseCardProps {
 
 export const CourseCard: React.FC<CourseCardProps> = ({ course, isExpanded, toggleExpand }) => (
   <motion.div
-    className="course-card bg-gray-800 rounded-lg shadow-md overflow-hidden"
+    className="course-card bg-zinc-950 rounded-lg shadow-md overflow-hidden"
     whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
   >
-    <Image src={course.thumbnail} alt={course.title} className="w-full h-40 object-cover" />
+    <Image 
+      src={course.thumbnail} 
+      alt={course.title} 
+      width={250}
+      height={150}
+      className="w-full h-40 object-cover" 
+    />
     <div className="p-6">
       <h3 className="text-xl font-semibold mb-2 text-blue-300">{course.title}</h3>
       <p className="text-gray-400 mb-4">{course.description}</p>
