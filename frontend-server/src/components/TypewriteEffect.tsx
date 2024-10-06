@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Navbar from "./Navbar";
+
 import { TypewriterEffectSmooth } from "./ui/typewriter-effect";
 import { FaInstagram, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { StylisButton } from "./buttons/StylisButton";

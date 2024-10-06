@@ -13,7 +13,7 @@
     "@radix-ui/react-label": "^2.1.0",
     "@tabler/icons-react": "^3.7.0",
     "clsx": "^2.1.1",
-    "framer-motion": "^11.2.11",
+    "framer-motion": "^11.11.1",
     "gsap": "^3.12.5",
     "lenis": "^1.1.4",
     "locomotive-scroll": "^4.1.4",

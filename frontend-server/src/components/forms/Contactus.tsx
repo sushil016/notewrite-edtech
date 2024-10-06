@@ -6,7 +6,7 @@ import { LabelInputContainer } from "../inputContainer/InputConatiner";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { BottomGradient } from "../effects/BotttomGradient";
-import Navbar from "../Navbar";
+
 import { IoCall, IoChatbubblesSharp } from "react-icons/io5";
 import { FaLocationDot } from "react-icons/fa6";
 

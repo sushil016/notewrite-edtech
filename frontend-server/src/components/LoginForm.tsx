@@ -7,6 +7,7 @@ import { LabelInputContainer } from "./inputContainer/InputConatiner";
 import { useRouter } from "next/navigation";
 import SubHeading from "./headersComponent/SubHeading";
 import Heading from "./headersComponent/Heading";
+import Link from "next/link";
 
 export function LoginForm() {
 
@@ -57,6 +58,8 @@ export function LoginForm() {
 
           <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
         </form>
+
+        <Link className="flex justify-center items-center hover:text-blue-500" href={'/signup'}> Dotnot have an account {" "} Sign-up </Link>
       </div>
     </main>
   );

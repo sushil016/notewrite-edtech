@@ -54,7 +54,7 @@ const Landing = () => {
         <div ref={codeRef} className="w-full flex justify-center items-center">
           {" "}
           <p className="bg-gradient-to-r from-blue-600 via-purple-500 to-indigo-400 inline-block    text-transparent bg-clip-text text-[4rem] ">
-            Robotics Docs and Tutorials
+            ClassNotes and ExamPrep
           </p>
         </div>
       </div>
