@@ -5,9 +5,10 @@ import { ScrollTrigger } from "gsap/all";
 import { Source_Code_Pro } from "next/font/google";
 import { useGSAP } from "@gsap/react";
 import { TopCoursesSection } from './courses/TopCoursesSection';
-import { ListedCoursesSection } from '@/components/courses/ListedCoursesSection';
-import { TestimonialsSection } from '@/components/testimonials/TestimonialsSection';
+import { ListedCoursesSection } from './courses/ListedCoursesSection';
+
 import { courses, categories, testimonials } from '../data/mockData';
+import { TestimonialsSection } from "./testimonials/TestimonialsSection";
 
 const codepro = Source_Code_Pro({ weight: "400", subsets: ["latin"] });
 

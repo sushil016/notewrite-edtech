@@ -1,7 +1,11 @@
 import React from 'react'
 import { BottomGradient } from '../effects/BotttomGradient'
 
-const Button = ( {value} ) => {
+interface ButtonProps {
+  value: string;
+}
+
+const Button: React.FC<ButtonProps> = ({ value }) => {
   return (
     <div>
        <button
