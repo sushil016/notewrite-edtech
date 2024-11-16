@@ -1,5 +1,5 @@
-import { Testimonial } from '@/src/types/testimonial';
-import { StarRating } from '@/src/components/common/StarRating';
+import { Testimonial } from '@/types/testimonial';
+import { StarRating } from '@/components/common/StarRating';
 import Image from 'next/image';
 
 interface TestimonialCardProps {

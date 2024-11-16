@@ -3,7 +3,7 @@ import { Clock, BarChart } from 'lucide-react';
 
 import Image from 'next/image';
 import { StarRating } from '../common/StarRating';
-import { Course } from '@/src/types/course';
+import { Course } from '@/types/course';
 
 
 

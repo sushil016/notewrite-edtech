@@ -8,58 +8,155 @@ import { useRouter } from "next/navigation";
 import SubHeading from "./headersComponent/SubHeading";
 import Heading from "./headersComponent/Heading";
 import Link from "next/link";
+import axios from "axios";
+
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
 export function LoginForm() {
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-   const [email , setEmail ] = useState("")
-   const [password , setPassword ] = useState("")
+  const router = useRouter();
 
-  const router = useRouter()
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Form submitted");
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
   };
-  return (
-    <main className="flex justify-center items-center ">
-      <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black mt-40">
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Validate input
+      if (!formData.email || !formData.password) {
+        throw new Error("Please fill in all fields");
+      }
+
+      // Make login request to backend
+      const response = await axios.post(
+        'http://localhost:8000/api/v1/auth/login',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true, // Important for cookies
+        }
+      );
+
+      if (response.data.success) {
+        // Store user data in localStorage
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        // Store token in localStorage
+        localStorage.setItem('token', response.data.token);
         
-        <Heading value={'Welcome to Robonauts'}/>
-        <SubHeading value={'Enter your Credentials to Access Your account'}/>
+        // Show success message
+        alert('Login successful!');
+        
+        // Redirect based on user role
+        switch (response.data.user.accountType) {
+          case 'ADMIN':
+            router.push('/admin/dashboard');
+            break;
+          case 'TEACHER':
+            router.push('/teacher/dashboard');
+            break;
+          default:
+            router.push('/dashboard');
+        }
+      }
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message || 
+        error.message || 
+        "Failed to login"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <main className="flex justify-center items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-600">
+      <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+        <Heading value={'Welcome to Robonauts'} />
+        <SubHeading value={'Enter your Credentials to Access Your account'} />
 
         <form className="my-8" onSubmit={handleSubmit}>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="email">Email Address</Label>
             <Input
-              onChange={ (e) => {setEmail(e.target.value)}}
               id="email"
-              placeholder="notewrite.bvcoenm@gmail.com"
+              placeholder="you@example.com"
               type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              disabled={loading}
+              required
             />
           </LabelInputContainer>
+
           <LabelInputContainer className="mb-4">
             <Label htmlFor="password">Password</Label>
-            <Input 
-            onChange={ (e) => {setPassword(e.target.value)}}
-            id="password"
-            placeholder="••••••••" 
-            type="password" />
+            <Input
+              id="password"
+              placeholder="••••••••"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              disabled={loading}
+              required
+            />
           </LabelInputContainer>
 
-          <button onClick={ ()=>{ router.push('/forgot-password')}} className="flex text-blue-500 w-full justify-end text-sm pr-2 hover:text-blue-400"> Forgot Password</button>
+          {error && (
+            <div className="text-red-500 text-sm mb-4">
+              {error}
+            </div>
+          )}
+
+          <div className="flex justify-end mb-4">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-blue-500 hover:text-blue-400"
+            >
+              Forgot Password?
+            </Link>
+          </div>
 
           <button
-            className="bg-gradient-to-br mt-6 relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+            className={`bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset] ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             type="submit"
+            disabled={loading}
           >
-            Sign in &rarr;
+            {loading ? 'Signing in...' : 'Sign in →'}
             <BottomGradient />
           </button>
 
           <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-        </form>
 
-        <Link className="flex justify-center items-center hover:text-blue-500" href={'/signup'}> Dotnot have an account {" "} Sign-up </Link>
+          <div className="text-center">
+            <Link
+              href="/signup"
+              className="text-sm text-blue-500 hover:text-blue-400"
+            >
+              Don&apos;t have an account? Sign up
+            </Link>
+          </div>
+        </form>
       </div>
     </main>
   );

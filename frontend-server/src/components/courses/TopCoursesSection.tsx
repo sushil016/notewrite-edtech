@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Course } from '@/src/types/course';
+import { Course } from '@/types/course';
 import { CourseCard } from './CourseCard';
 
 

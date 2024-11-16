@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String           @id @default(uuid())
+  firstName           String
+  lastName            String
+  email               String           @unique
+  contactNumber       String
+  password           String
+  accountType        AccountType
+  image              String?
+  token              String?
+  resetPasswordExpires DateTime?
+  
+  // Relations
+  profile            Profile          @relation(fields: [profileId], references: [id])
+  profileId          String           @unique
+  courses            Course[]         // Courses created by teacher
+  enrolledCourses    Course[]         @relation("StudentEnrollment")
+  courseProgress     CourseProgress[]
+
+  @@map("users")
+}
+
+enum AccountType {
+  ADMIN
+  STUDENT
+  TEACHER
+}
+
+model Profile {
+  id           String    @id @default(uuid())
+  gender       String?
+  dateOfBirth  String?
+  about        String?
+  user         User?
+
+  @@map("profiles")
+}
+
+model Course {
+  id               String        @id @default(uuid())
+  courseName       String
+  courseDescription String?
+  whatYouWillLearn String?
+  status          CourseStatus  @default(DRAFT)
+  tag             String[]
+  instructions    String[]
+  
+  // Relations
+  teacher         User          @relation(fields: [teacherId], references: [id])
+  teacherId       String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  categoryId      String
+  students        User[]        @relation("StudentEnrollment")
+  sections        Section[]
+  courseProgress  CourseProgress[]
+
+  @@map("courses")
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Section {
+  id           String       @id @default(uuid())
+  sectionName  String
+  
+  // Relations
+  course       Course       @relation(fields: [courseId], references: [id])
+  courseId     String
+  subSections  SubSection[]
+
+  @@map("sections")
+}
+
+model SubSection {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  timeDuration String?
+  videoUrl     String?
+  
+  // Relations
+  section      Section      @relation(fields: [sectionId], references: [id])
+  sectionId    String
+  completedBy  CourseProgress[] @relation("CompletedVideos")
+
+  @@map("sub_sections")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  courses     Course[]
+
+  @@map("categories")
+}
+
+model CourseProgress {
+  id             String       @id @default(uuid())
+  
+  // Relations
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+  course         Course       @relation(fields: [courseId], references: [id])
+  courseId       String
+  completedVideos SubSection[] @relation("CompletedVideos")
+
+  @@map("course_progress")
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("otps")
+}

@@ -1,5 +1,5 @@
 
-import RoboticsSection from '@/src/components/RoboticsSection'
+import RoboticsSection from '@/components/RoboticsSection'
 import React from 'react'
 
 const page = () => {

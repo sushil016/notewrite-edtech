@@ -6,28 +6,29 @@ import { useGSAP } from "@gsap/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MovingButton } from "./ui/moving-border";
-import { signOut, useSession } from "next-auth/react";
 import ThemeSwitch from "./ThemeSwitch";
+import { UserDropdown } from "./ui/UserDropdown";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const gsapRef = useRef<HTMLDivElement>(null);
-  const {data:session} = useSession();
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
 
   useGSAP(() => {
     gsap.from(gsapRef.current, {
       y: -50,
       opacity: 0,
       duration: 1,
-      dealy: 0.6,
+      delay: 0.6,
       stagger: 0.2,
     });
   });
-  const router = useRouter();
 
   return (
     <div
       ref={gsapRef}
-      className=" text-white w-full h-[] flex justify-evenly gap-6 p-4 backdrop-blur-sm border-b-1 drop-shadow-lg shadow-lg shadow-zinc-100/10 fixed z-50"
+      className="text-white w-full flex justify-between items-center px-6 py-4 backdrop-blur-sm border-b-1 drop-shadow-lg shadow-lg shadow-zinc-100/10 fixed z-50"
     >
       <button
         onClick={() => router.push("/")}
@@ -36,44 +37,49 @@ const Navbar = () => {
         Robonauts
       </button>
 
-      <div className="flex gap-8">
-        <button 
-         onClick={() => {
-          router.push("/services");
-        }}
-        className="w-32 h-8 text-zinc-300 hover:text-blue-400    hover:scale-105 translate transform duration-150">
-          services
+      <div className="flex items-center gap-8">
+        <button
+          onClick={() => router.push("/services")}
+          className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150"
+        >
+          Services
         </button>
-        <button  className="w-32 h-8 text-zinc-300 hover:text-blue-400 hover:scale-105 translate transform duration-150">
+        <button
+          className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150"
+        >
           Courses
         </button>
         <button
-          onClick={() => {
-            router.push("/contact");
-          }}
-          className="w-32 h-8 text-zinc-300 hover:text-blue-400 hover:scale-105 translate transform duration-150"
+          onClick={() => router.push("/contact")}
+          className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150"
         >
           Contact us
         </button>
       </div>
-     <div className=" absolute right-32 top-7"> <ThemeSwitch/></div>
 
-      <Link href="/login">
-        {" "}
-        {session?.user?.email && <MovingButton
-          onClick={()=> signOut()}
-          borderRadius="1rem"
-          className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
-        >
-          Logout
-        </MovingButton>}
-        {!session?.user && <MovingButton
-          borderRadius="1rem"
-          className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
-        >
-          Login
-        </MovingButton>}
-      </Link>
+      <div className="flex items-center gap-4">
+        <ThemeSwitch />
+
+        {isAuthenticated() && user ? (
+          <UserDropdown
+            user={{
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              accountType: user.accountType,
+            }}
+          />
+        ) : (
+          <Link href="/login">
+            <MovingButton
+              borderRadius="1rem"
+              className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
+            >
+              Login
+            </MovingButton>
+          </Link>
+        )}
+      </div>
     </div>
   );
 };

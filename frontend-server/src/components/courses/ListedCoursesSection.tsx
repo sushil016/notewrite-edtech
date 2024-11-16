@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import { Course } from '@/src/types/course';
+import { Course } from '@/types/course';
 
-import { SearchBar } from '@/src/components/common/SearchBar';
-import { Button } from '@/src/components/common/Button';
+import { SearchBar } from '@/components/common/SearchBar';
+import { Button } from '@/components/common/Button';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CourseCard } from './CourseCard';
@@ -19,7 +19,7 @@ export const ListedCoursesSection: React.FC<ListedCoursesSectionProps> = ({ cour
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
   const controls = useAnimation();
 
   const filteredCourses = courses.filter(course => 

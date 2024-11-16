@@ -1,4 +1,4 @@
-import Contactus from '@/src/components/forms/Contactus'
+import Contactus from '@/components/forms/Contactus'
 import React from 'react'
 
 const page = () => {

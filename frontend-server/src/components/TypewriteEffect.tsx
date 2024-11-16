@@ -35,8 +35,9 @@ export function TypewriteEffect() {
         <TypewriterEffectSmooth words={words} />
 
         <div className="flex flex-col md:flex-row space-y-16 md:space-y-0 space-x-0 md:space-x-4 ">
-          <div>
-            <StylisButton />
+          <div className="flex flex-row gap-8">
+            <StylisButton onClick={()=>navigate.push('/signup')} text="Get Started &rarr;" />
+            <StylisButton onClick={()=>navigate.push('/signup-instructor')} text="Become an Instructor &rarr;" />
           </div>
         </div>
         <div className="mt-24 gap-8">

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import { Testimonial } from '@/src/types/testimonial';
+import { Testimonial } from '@/types/testimonial';
 import { TestimonialCard } from './TestimonialCard';
-import { Button } from '@/src/components/common/Button';
+import { Button } from '@/components/common/Button';
 
 interface TestimonialsSectionProps {
   testimonials: Testimonial[];
