@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import { Clock, BarChart } from 'lucide-react';
-import { Course } from '@/types/course';
-import { StarRating } from '@/components/common/StarRating';
+
 import Image from 'next/image';
+import { StarRating } from '../common/StarRating';
+import { Course } from '@/src/types/course';
+
+
 
 interface CourseCardProps {
   course: Course;
@@ -36,7 +39,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, isExpanded, togg
         </div>
       </div>
       <div className="flex justify-between items-center mb-4">
-        <StarRating rating={course.rating} />
+        <StarRating
+        
+        rating={course.rating} />
         <span className="text-sm text-gray-600">{course.enrolledStudents.toLocaleString()} students</span>
       </div>
       <div className="flex justify-between items-center">

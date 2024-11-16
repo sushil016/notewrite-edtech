@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import SmoothScroll from "@/components/SmoothScroll";
+import Navbar from "@/src/components/Navbar";
+import Footer from "@/src/components/Footer";
+
 import { Roboto } from "next/font/google";
 import { Providers } from "./providers";
 
@@ -24,13 +24,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
-        <SmoothScroll>
+
           <Providers>
             <Navbar/>            
                {children}          
             <Footer />
           </Providers>
-        </SmoothScroll>
+   
       </body>
     </html>
   );

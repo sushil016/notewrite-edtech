@@ -1,10 +1,10 @@
-"use client";
+// "use client";
 
-import  {ReactLenis}  from "lenis";
+// import  {ReactLenis}  from "lenis";
 
-function SmoothScroll({ children } : {children : React.ReactNode}) {
-  return <ReactLenis root>{children}</ReactLenis>;
-}
+// function SmoothScroll({ children } : {children : React.ReactNode}) {
+//   return <ReactLenis root>{children}</ReactLenis>;
+// }
 
-export default SmoothScroll;
+// export default SmoothScroll;
 

@@ -1,5 +1,5 @@
-import { Testimonial } from "@/types/testimonial";
-import { Course } from '@/types/course';  // Changed 'Course' to 'course'
+import { Testimonial } from "../types/testimonial";
+import { Course } from '../types/course';  // Changed 'Course' to 'course'
 
 export const testimonials: Testimonial[] = [
     {

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import { Course } from '@/types/course';
+import { Course } from '@/src/types/course';
 
-import { SearchBar } from '@/components/common/SearchBar';
-import { Button } from '@/components/common/Button';
+import { SearchBar } from '@/src/components/common/SearchBar';
+import { Button } from '@/src/components/common/Button';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CourseCard } from './CourseCard';

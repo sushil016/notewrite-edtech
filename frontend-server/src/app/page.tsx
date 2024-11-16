@@ -1,9 +1,6 @@
 "use client";
-import Landing from "@/components/Landing";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/all";
-import { useEffect, useRef } from "react";
+import Landing from "@/src/components/Landing";
+
 
 export default function Home() {
   return (
