@@ -2,12 +2,12 @@ import { Router, Request, Response } from 'express';
 import { signup, login } from '../controllers/auth';
 import { sendOTP, verifyOTP } from '../controllers/otpController';
 import { changePassword } from '../controllers/changePassword';
-import { 
-  authenticateUser, 
-  isAdmin, 
-  isInstructor, 
-  isStudent 
-} from '../Middlewares/auth';
+// import { 
+//   authenticateUser, 
+//   isAdmin, 
+//   isInstructor, 
+//   isStudent 
+// } from '../Middlewares/auth';
 
 const router = Router();
 
