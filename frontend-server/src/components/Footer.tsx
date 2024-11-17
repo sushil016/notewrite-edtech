@@ -31,7 +31,7 @@ const Footer = () => {
             <h3 className="text-2xl font-bold mb-2">Subscribe to Our Newsletter</h3>
             <p className="text-gray-400">Stay updated with our latest courses and tech news</p>
           </div>
-          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto justify-center">
             <Input
               type="email"
               placeholder="Enter your email"
@@ -41,9 +41,9 @@ const Footer = () => {
               required
             />
             <MovingButton>
-              <button type="submit" className="whitespace-nowrap">
-                Subscribe Now
-              </button>
+              {/* <button type="submit" className="whitespace-nowrap"> */}
+                <span>Subscribe Now</span>
+             
             </MovingButton>
           </form>
         </div>
