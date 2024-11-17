@@ -4,6 +4,12 @@ const express_1 = require("express");
 const auth_1 = require("../controllers/auth");
 const otpController_1 = require("../controllers/otpController");
 const changePassword_1 = require("../controllers/changePassword");
+// import { 
+//   authenticateUser, 
+//   isAdmin, 
+//   isInstructor, 
+//   isStudent 
+// } from '../Middlewares/auth';
 const router = (0, express_1.Router)();
 // Error handler wrapper
 const asyncHandler = (fn) => (req, res) => {
