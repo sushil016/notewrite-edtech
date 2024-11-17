@@ -1,30 +1,76 @@
-import { create } from 'zustand';
+import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/config/api';
+import { AuthUser } from '@/lib/auth';
 
-interface AuthState {
-  user: any | null;
-  token: string | null;
-  setAuth: (user: any, token: string) => void;
-  clearAuth: () => void;
-  isAuthenticated: () => boolean;
-}
+export const useAuth = () => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export const useAuth = create<AuthState>((set, get) => ({
-  user: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null,
-  token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
-  
-  setAuth: (user, token) => {
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
-    set({ user, token });
-  },
-  
-  clearAuth: () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    set({ user: null, token: null });
-  },
-  
-  isAuthenticated: () => {
-    return !!get().token;
-  },
-})); 
+  const verifyAuth = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/verify`, {
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const { user } = await response.json();
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Auth verification error:', error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      setUser(data.user);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      // Clear the cookie by making it expire
+      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const isAuthenticated = () => !!user;
+
+  useEffect(() => {
+    verifyAuth();
+  }, []);
+
+  return {
+    user,
+    loading,
+    login,
+    logout,
+    isAuthenticated,
+  };
+}; 

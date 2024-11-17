@@ -31,6 +31,7 @@ model User {
   courses            Course[]         // Courses created by teacher
   enrolledCourses    Course[]         @relation("StudentEnrollment")
   courseProgress     CourseProgress[]
+  settings           UserSettings?
 
   @@map("users")
 }
@@ -134,4 +135,18 @@ model OTP {
   expiresAt DateTime
 
   @@map("otps")
+}
+
+model UserSettings {
+  id              String    @id @default(uuid())
+  theme           String    @default("dark")
+  fontSize        String    @default("medium")
+  notifications   Json      @default("{\"email\":true,\"push\":false,\"updates\":true,\"marketing\":false}")
+  privacy         Json      @default("{\"profileVisibility\":\"public\",\"twoFactorEnabled\":false}")
+  
+  // Relations
+  user           User      @relation(fields: [userId], references: [id])
+  userId         String    @unique
+
+  @@map("user_settings")
 }

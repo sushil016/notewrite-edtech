@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/authRoutes';
+import profileRoutes from './routes/profileRoutes'
+import settingsRoutes from './routes/settingsRoutes'
 
 dotenv.config();
 
@@ -15,8 +17,11 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['set-cookie'],
 }));
 
 // Health check route
@@ -29,6 +34,14 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/profile', profileRoutes)
+app.use('/api/settings', settingsRoutes)
+
+// Add a test route to check token
+app.get('/api/test-auth', (req, res) => {
+  console.log('Cookies received:', req.cookies);
+  res.json({ cookies: req.cookies });
+});
 
 // Global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

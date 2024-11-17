@@ -1,13 +1,13 @@
 import { Router, Request, Response } from 'express';
-import { signup, login } from '../controllers/auth';
+import { signup, login, verifyAuth } from '../controllers/auth';
 import { sendOTP, verifyOTP } from '../controllers/otpController';
 import { changePassword } from '../controllers/changePassword';
-// import { 
-//   authenticateUser, 
-//   isAdmin, 
-//   isInstructor, 
-//   isStudent 
-// } from '../Middlewares/auth';
+import { 
+  authenticateUser, 
+  isAdmin, 
+  isInstructor, 
+  isStudent 
+} from '../middlewares/auth';
 
 const router = Router();
 
@@ -27,6 +27,7 @@ router.post('/login', asyncHandler(login));
 router.post('/send-otp', asyncHandler(sendOTP));
 router.post('/verify-otp', asyncHandler(verifyOTP));
 router.post('/change-password', asyncHandler(changePassword));
+router.get('/verify', authenticateUser, asyncHandler(verifyAuth));
 
 // Protected routes
 // router.get('/admin-only', authenticateUser, isAdmin, (req: Request, res: Response) => {

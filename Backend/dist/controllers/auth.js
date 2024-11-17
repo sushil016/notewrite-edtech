@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.signup = void 0;
+exports.verifyAuth = exports.login = exports.signup = void 0;
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -113,29 +113,31 @@ const login = async (req, res) => {
                 message: "Invalid password",
             });
         }
+        // Generate token with all necessary information
         const token = jsonwebtoken_1.default.sign({
-            email: user.email,
             id: user.id,
-            accountType: user.accountType,
-        }, process.env.JWT_SECRET, { expiresIn: "2h" });
-        const options = {
-            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            email: user.email,
+            accountType: user.accountType
+        }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        // Set cookie with proper options
+        res.cookie('token', token, {
             httpOnly: true,
-        };
-        return res
-            .cookie("token", token, options)
-            .status(200)
-            .json({
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+            path: '/' // Add this to ensure cookie is available for all paths
+        });
+        // Send response
+        return res.status(200).json({
             success: true,
-            token,
+            message: 'Login successful',
             user: {
                 id: user.id,
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                accountType: user.accountType,
-            },
-            message: "Logged in successfully",
+                accountType: user.accountType
+            }
         });
     }
     catch (error) {
@@ -147,3 +149,43 @@ const login = async (req, res) => {
     }
 };
 exports.login = login;
+const verifyAuth = async (req, res) => {
+    var _a;
+    try {
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Not authenticated"
+            });
+        }
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                accountType: true
+            }
+        });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            user
+        });
+    }
+    catch (error) {
+        console.error("Verify auth error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+exports.verifyAuth = verifyAuth;

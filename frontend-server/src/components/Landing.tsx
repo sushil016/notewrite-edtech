@@ -54,10 +54,10 @@ const Landing = () => {
         {" "}
         <div ref={codeRef} className="w-full flex justify-center items-center">
           {" "}
-          <p className="bg-gradient-to-r from-blue-600 via-purple-500 to-indigo-400 inline-block    text-transparent bg-clip-text text-[4rem] ">
+          <p className="bg-gradient-to-r from-blue-600 via-purple-500 to-indigo-400 inline-block    text-transparent bg-clip-text text-[2rem] sm:text-[2rem] md:text-[4rem] text-center">
             ClassNotes and ExamPrep
           </p>
-        </div>
+        </div>  
       </div>
 
       <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />

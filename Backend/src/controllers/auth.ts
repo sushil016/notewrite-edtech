@@ -106,7 +106,7 @@ export const signup = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password }: LoginInput = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -136,42 +136,85 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
+    // Generate token with all necessary information
     const token = jwt.sign(
-      {
-        email: user.email,
+      { 
         id: user.id,
-        accountType: user.accountType,
+        email: user.email,
+        accountType: user.accountType
       },
       process.env.JWT_SECRET!,
-      { expiresIn: "2h" }
+      { expiresIn: '24h' }
     );
 
-    const options = {
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    // Set cookie with proper options
+    res.cookie('token', token, {
       httpOnly: true,
-    };
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      path: '/'  // Add this to ensure cookie is available for all paths
+    });
 
-    return res
-      .cookie("token", token, options)
-      .status(200)
-      .json({
-        success: true,
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          accountType: user.accountType,
-        },
-        message: "Logged in successfully",
-      });
-
+    // Send response
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        accountType: user.accountType
+      }
+    });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
+    });
+  }
+};
+
+export const verifyAuth = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated"
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        accountType: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user
+    });
+  } catch (error) {
+    console.error("Verify auth error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
     });
   }
 };

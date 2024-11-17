@@ -28,14 +28,14 @@ export function TypewriteEffect() {
   ];
   return (
     <>
-      <div className="flex flex-col items-center h-[30rem]  ">
+      <div className="flex flex-col items-center h-[30rem] text-xl sm:text-base ">
         <p className="text-neutral-400 dark:text-neutral-100 text-xl sm:text-base mt-[11rem] ">
           Team ROBONAUTS HERE!
         </p>
         <TypewriterEffectSmooth words={words} />
 
         <div className="flex flex-col md:flex-row space-y-16 md:space-y-0 space-x-0 md:space-x-4 ">
-          <div className="flex flex-row gap-8">
+          <div className="flex sm:flex-row flex-col sm:gap-4 md:gap-8 text-sm md:text-base gap-4">
             <StylisButton onClick={()=>navigate.push('/signup')} text="Get Started &rarr;" />
             <StylisButton onClick={()=>navigate.push('/signup-instructor')} text="Become an Instructor &rarr;" />
           </div>

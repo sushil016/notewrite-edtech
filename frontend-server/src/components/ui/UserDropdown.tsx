@@ -9,21 +9,24 @@ import {
   FaSignOutAlt,
   FaChevronDown 
 } from 'react-icons/fa';
+import Link from 'next/link';
 
-interface UserDropdownProps {
-  user: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    accountType: string;
-  };
+interface User {
+  firstName: string;
+  lastName: string;
+  email: string;
+  accountType: "ADMIN" | "TEACHER" | "STUDENT";
 }
 
-export const UserDropdown = ({ user }: UserDropdownProps) => {
+interface UserDropdownProps {
+  user: User;
+}
+
+export const UserDropdown: React.FC<UserDropdownProps> = ({ user }) => {
+  const { logout, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { clearAuth } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -36,95 +39,64 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSignOut = () => {
-    clearAuth();
-    router.push('/');
-  };
-
-  const getAccountTypeColor = (type: string) => {
-    switch (type) {
-      case 'ADMIN':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'TEACHER':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      default:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-    }
-  };
+  if (!isAuthenticated() || !user) {
+    return (
+      <Link 
+        href="/login" 
+        className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+      >
+        Login
+      </Link>
+    );
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors duration-200"
+        className="flex items-center space-x-3 focus:outline-none"
       >
-        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-          {user.firstName[0].toUpperCase()}
+        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+          <span className="text-gray-600">
+            {user.firstName[0]}
+            {user.lastName[0]}
+          </span>
         </div>
-        <span className="text-sm font-medium dark:text-white">
-          {user.firstName} {user.lastName}
-        </span>
+        <div className="hidden md:block text-sm">
+          <p className="font-medium text-gray-700">
+            {user.firstName} {user.lastName}
+          </p>
+          <p className="text-gray-500 text-xs">{user.accountType}</p>
+        </div>
         <FaChevronDown className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
-          <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {user.firstName} {user.lastName}
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-              {user.email}
-            </p>
-            <span className={`inline-block px-2 py-1 mt-2 text-xs font-medium rounded-full ${getAccountTypeColor(user.accountType)}`}>
-              {user.accountType}
-            </span>
-          </div>
-
-          <div className="py-2">
-            <button
-              onClick={() => {
-                router.push('/profile');
-                setIsOpen(false);
-              }}
-              className="w-full px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+          <div className="py-1" role="menu">
+            <Link
+              href="/profile"
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              <FaUser className="text-gray-400" />
-              <span>Profile</span>
-            </button>
-
-            {(user.accountType === 'STUDENT' || user.accountType === 'TEACHER') && (
-              <button
-                onClick={() => {
-                  router.push('/my-courses');
-                  setIsOpen(false);
-                }}
-                className="w-full px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
-              >
-                <FaBook className="text-gray-400" />
-                <span>{user.accountType === 'STUDENT' ? 'My Courses' : 'My Teaching'}</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => {
-                router.push('/settings');
-                setIsOpen(false);
-              }}
-              className="w-full px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+              <FaUser className="mr-3" /> Profile
+            </Link>
+            <Link
+              href="/my-courses"
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              <FaCog className="text-gray-400" />
-              <span>Settings</span>
-            </button>
-
-            <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-
-            <button
-              onClick={handleSignOut}
-              className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center space-x-2"
+              <FaBook className="mr-3" /> My Courses
+            </Link>
+            <Link
+              href="/settings"
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              <FaSignOutAlt className="text-red-500" />
-              <span>Sign out</span>
+              <FaCog className="mr-3" /> Settings
+            </Link>
+            <button
+              onClick={logout}
+              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+            >
+              <FaSignOutAlt className="mr-3" /> Logout
             </button>
           </div>
         </div>
