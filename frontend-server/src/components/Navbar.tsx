@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
   const gsapRef = useRef<HTMLDivElement>(null);
-  const { user, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -43,6 +43,12 @@ const Navbar = () => {
       },
     },
   };
+
+  if (loading) {
+    return <nav>
+      {/* Show loading skeleton or spinner */}
+    </nav>;
+  }
 
   return (
     <nav>

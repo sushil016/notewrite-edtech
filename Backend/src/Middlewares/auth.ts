@@ -23,14 +23,13 @@ interface JwtPayload {
   accountType: string;
 }
 
-export const authenticateUser = (
+export const authenticateUser = async (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
+): Promise<void> => {
   try {
     const token = req.cookies.token;
-    console.log('Received token:', token);
 
     if (!token) {
       res.status(401).json({
@@ -41,23 +40,34 @@ export const authenticateUser = (
     }
 
     try {
-      // Make sure JWT_SECRET is available
       const secret = process.env.JWT_SECRET;
       if (!secret) {
         throw new Error('JWT_SECRET is not defined');
       }
 
       const decoded = jwt.verify(token, secret) as JwtPayload;
-      console.log('Decoded token:', decoded);
-      
       req.user = decoded;
+      
+      // Verify user exists in database
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: {
+          id: true,
+          email: true,
+          accountType: true,
+        },
+      });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
       next();
     } catch (error) {
       console.error('Token verification error:', error);
       res.status(401).json({
         success: false,
         message: 'Token is not valid',
-        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   } catch (error) {

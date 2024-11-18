@@ -52,8 +52,10 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      // Clear the cookie by making it expire
-      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
       setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
@@ -72,5 +74,6 @@ export const useAuth = () => {
     login,
     logout,
     isAuthenticated,
+    verifyAuth
   };
 }; 

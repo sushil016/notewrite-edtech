@@ -59,6 +59,43 @@ export function Signup() {
     }
   };
 
+  const handleVerificationSuccess = async (verifiedData: SignupFormData) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/api/v1/auth/signup',
+        verifiedData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.success) {
+        // Store user data
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Redirect based on account type
+        switch (verifiedData.accountType) {
+          case 'ADMIN':
+            router.push('/admin/dashboard');
+            break;
+          case 'TEACHER':
+            router.push('/teacher/dashboard');
+            break;
+          case 'STUDENT':
+            router.push('/'); // Students go to home page
+            break;
+          default:
+            router.push('/');
+        }
+      }
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Signup failed");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);

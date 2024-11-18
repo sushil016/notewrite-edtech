@@ -63,7 +63,7 @@ const Profile = () => {
     <div className="min-h-screen bg-gradient-to-b from-neutral-900 to-neutral-950">
       {/* Hero Section */}
       <div className="h-[40vh] relative flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20" />
+        <div className="absolute inset-0 bg-gradient-to-r mb-6 from-purple-500/20 to-blue-500/20 dark:from-purple-500/20 dark:to-blue-500/20 rounded-b-[70px]" />
         <TypewriterEffect words={words} />
       </div>
 

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import SubHeading from "./headersComponent/SubHeading";
 import Heading from "./headersComponent/Heading";
 import Link from "next/link";
-import axios from "axios";
+import { useAuth } from '@/hooks/useAuth';
 
 interface LoginFormData {
   email: string;
@@ -16,14 +16,14 @@ interface LoginFormData {
 }
 
 export function LoginForm() {
+  const { login } = useAuth();
+  const router = useRouter();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -38,50 +38,25 @@ export function LoginForm() {
     setError(null);
 
     try {
-      // Validate input
       if (!formData.email || !formData.password) {
         throw new Error("Please fill in all fields");
       }
 
-      // Make login request to backend
-      const response = await axios.post(
-        'http://localhost:8000/api/v1/auth/login',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true, // Important for cookies
-        }
-      );
+      const response = await login(formData.email, formData.password);
 
-      if (response.data.success) {
-        // Store user data in localStorage
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        // Store token in localStorage
-        localStorage.setItem('token', response.data.token);
-        
-        // Show success message
-        alert('Login successful!');
-        
-        // Redirect based on user role
-        switch (response.data.user.accountType) {
+      if (response.success) {
+        switch (response.user.accountType) {
           case 'ADMIN':
-            router.push('/admin/dashboard');
-            break;
           case 'TEACHER':
-            router.push('/teacher/dashboard');
-            break;
-          default:
             router.push('/dashboard');
+            break;
+          case 'STUDENT':
+          default:
+            router.push('/');
         }
       }
     } catch (error: any) {
-      setError(
-        error.response?.data?.message || 
-        error.message || 
-        "Failed to login"
-      );
+      setError(error.message || "Failed to login");
     } finally {
       setLoading(false);
     }
