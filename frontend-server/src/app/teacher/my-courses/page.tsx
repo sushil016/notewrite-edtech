@@ -74,7 +74,7 @@ export default function TeacherCourses() {
                         <div className="text-center text-white">Loading...</div>
                     ) : courses.length === 0 ? (
                         <div className="text-center text-gray-400">
-                            <p>You haven't created any courses yet.</p>
+                            <p>You havent created any courses yet.</p>
                             <MovingButton
                                 onClick={() => router.push('/teacher/createCourse')}
                                 className="mt-4"

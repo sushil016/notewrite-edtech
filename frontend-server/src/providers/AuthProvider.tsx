@@ -9,7 +9,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     auth.checkAuth();
-  }, []);
+  }, [auth]);
 
   return (
     <AuthContext.Provider value={auth}>

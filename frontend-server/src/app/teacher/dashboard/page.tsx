@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { MovingButton } from '@/components/ui/moving-border';
 import axiosInstance from '@/lib/axios';
-import { FaPlus } from 'react-icons/fa';
 
 interface Course {
   id: string;
@@ -83,7 +82,7 @@ export default function TeacherDashboard() {
                 ))
               ) : (
                 <div className="col-span-3 text-center text-gray-500">
-                  <p className="mb-4">You haven't created any courses yet.</p>
+                  <p className="mb-4">You havent created any courses yet.</p>
                   <MovingButton onClick={() => router.push('/teacher/createCourse')}>
                     Create Your First Course
                   </MovingButton>
