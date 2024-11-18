@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import axiosInstance from "@/lib/axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,7 +10,6 @@ import { MovingButton } from "@/components/ui/moving-border";
 import { Input } from "@/components/ui/input";
 import TextArea from "@/components/ui/textArea";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 const categorySchema = z.object({
   name: z.string().min(3, "Category name must be at least 3 characters"),
@@ -19,10 +19,9 @@ const categorySchema = z.object({
 type CategoryFormData = z.infer<typeof categorySchema>;
 
 export default function Dashboard() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [categories, setCategories] = useState<Array<{ id: string; name: string; description: string }>>([]);
-  const { data: session } = useSession();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema)
@@ -30,14 +29,8 @@ export default function Dashboard() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/categories/all', {
-        headers: {
-          'Authorization': `Bearer ${session?.user?.token}`
-        }
-      });
-      if (!response.ok) throw new Error('Failed to fetch categories');
-      const data = await response.json();
-      setCategories(data.data);
+      const response = await axiosInstance.get('/api/v1/categories/all');
+      setCategories(response.data.data);
     } catch (error) {
       toast.error('Error fetching categories');
       console.error(error);
@@ -45,12 +38,12 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (!loading && !isAuthenticated()) {
+    if (!isLoading && !isAuthenticated) {
       router.push("/login");
       return;
     }
 
-    if (!loading && user?.accountType === 'STUDENT') {
+    if (!isLoading && user?.accountType === 'STUDENT') {
       router.push('/');
       return;
     }
@@ -58,48 +51,27 @@ export default function Dashboard() {
     if (user?.accountType === 'TEACHER') {
       fetchCategories();
     }
-  }, [loading, isAuthenticated, router, user]);
+  }, [isLoading, isAuthenticated, router, user]);
 
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/categories/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.user?.token}`
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create category');
-      }
-
+      const response = await axiosInstance.post('/api/v1/categories/create', data);
       toast.success('Category created successfully');
       reset();
-      fetchCategories(); // Refresh the categories list
+      fetchCategories();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error creating category');
       console.error(error);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen p-8 pt-20 flex justify-center items-center">
         Loading...
       </div>
     );
   }
-
-  // if (!user || user.accountType === 'STUDENT') {
-  //   return (
-  //     <div className="min-h-screen p-8 pt-20 flex justify-center items-center">
-  //       Redirecting...
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="min-h-screen p-8 pt-20">

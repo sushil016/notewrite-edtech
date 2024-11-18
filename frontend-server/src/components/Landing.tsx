@@ -97,11 +97,11 @@ const Landing = () => {
   }, []);
 
   return (
-    <div className="relative bg-[#0F172A]">
+    <div className="relative bg-[#0F172A] py-10">
       {/* TypewriteEffect Section */}
       <section 
         ref={typewriteRef} 
-        className="h-[70vh] w-full flex items-center justify-center bg-[#0F172A] fixed top-0 left-0 z-30 will-change-transform"
+        className="h-[70vh] w-full flex items-center justify-center bg-[#0F172A] fixed top-0 left-0 z-30 will-change-transform pb-30"
       >
         <TypewriteEffect />
       </section>

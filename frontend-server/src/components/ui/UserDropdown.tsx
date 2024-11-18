@@ -39,7 +39,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ user }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  if (!isAuthenticated() || !user) {
+  if (!isAuthenticated || !user) {
     return (
       <Link 
         href="/login" 

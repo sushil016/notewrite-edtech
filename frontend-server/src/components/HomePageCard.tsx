@@ -86,7 +86,7 @@ const HomePageCard = () => {
             </div>
 
             {/* Chart */}
-            <div className="h-72 w-full bg-gray-900/30 rounded-lg p-4 border border-gray-800">
+            {/* <div className="h-72 w-full bg-gray-900/30 rounded-lg p-4 border border-gray-800">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
@@ -122,7 +122,7 @@ const HomePageCard = () => {
                   />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
+            </div> */}
 
             {/* Navigation Tabs */}
             <div className="flex flex-wrap justify-between items-center border-t border-gray-800 pt-6 gap-2">

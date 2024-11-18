@@ -11,21 +11,23 @@ import { UserDropdown } from "./ui/UserDropdown";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 
-const Navbar = () => {
+export function Navbar() {
   const gsapRef = useRef<HTMLDivElement>(null);
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   useGSAP(() => {
-    gsap.from(gsapRef.current, {
-      y: -50,
-      opacity: 0,
-      duration: 1,
-      delay: 0.6,
-      stagger: 0.2,
-    });
-  });
+    if (gsapRef.current) {
+      gsap.from(gsapRef.current, {
+        y: -50,
+        opacity: 0,
+        duration: 1,
+        delay: 0.6,
+        stagger: 0.2,
+      });
+    }
+  }, []);
 
   const menuVariants = {
     closed: {
@@ -44,17 +46,11 @@ const Navbar = () => {
     },
   };
 
-  if (loading) {
-    return <nav>
-      {/* Show loading skeleton or spinner */}
-    </nav>;
-  }
-
   return (
-    <nav>
+    <nav className="w-full fixed top-0 z-50 bg-gradient-to-b from-gray-900 to-gray-800">
       <div
         ref={gsapRef}
-        className="text-white w-full flex justify-between items-center px-6 py-4 backdrop-blur-sm border-b-1 drop-shadow-lg shadow-lg shadow-zinc-100/10 fixed z-50"
+        className="w-full flex justify-between items-center px-6 py-4 backdrop-blur-sm border-b border-zinc-800 shadow-lg"
       >
         <button
           onClick={() => router.push("/")}
@@ -73,7 +69,8 @@ const Navbar = () => {
           </button>
           <button
             onClick={() => router.push("/courses")}
-           className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150">
+            className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150"
+          >
             Courses
           </button>
           <button
@@ -87,7 +84,9 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-4">
           <ThemeSwitch />
 
-          {isAuthenticated() && user ? (
+          {isLoading ? (
+            <div className="animate-pulse w-8 h-8 bg-blue-400/10 rounded-full" />
+          ) : isAuthenticated && user ? (
             <UserDropdown
               user={{
                 firstName: user.firstName,
@@ -182,7 +181,7 @@ const Navbar = () => {
               </button>
               <div className="flex flex-col items-center gap-4 pt-4 border-t border-zinc-700/50 w-full">
                 <ThemeSwitch />
-                {isAuthenticated() && user ? (
+                {isAuthenticated && user ? (
                   <UserDropdown
                     user={{
                       firstName: user.firstName,
@@ -208,6 +207,6 @@ const Navbar = () => {
       </AnimatePresence>
     </nav>
   );
-};
+}
 
 export default Navbar;

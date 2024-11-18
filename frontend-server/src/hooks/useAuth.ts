@@ -1,79 +1,66 @@
-import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/config/api';
-import { AuthUser } from '@/lib/auth';
+import { create } from 'zustand';
+import axiosInstance from '@/lib/axios';
+import Cookies from 'js-cookie';
 
-export const useAuth = () => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  accountType: 'ADMIN' | 'TEACHER' | 'STUDENT';
+}
 
-  const verifyAuth = async () => {
+interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; user: User }>;
+  logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
+}
+
+export const useAuth = create<AuthState>((set) => ({
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+
+  login: async (email: string, password: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/verify`, {
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const { user } = await response.json();
-        setUser(user);
-      } else {
-        setUser(null);
-      }
+      const response = await axiosInstance.post('/api/v1/auth/login', { email, password });
+      const { token, user } = response.data;
+      
+      localStorage.setItem('token', token);
+      Cookies.set('token', token, { expires: 1 });
+      
+      set({ user, isAuthenticated: true, isLoading: false });
+      
+      return { success: true, user };
     } catch (error) {
-      console.error('Auth verification error:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      setUser(data.user);
-      return data;
-    } catch (error) {
+      set({ isLoading: false });
       throw error;
     }
-  };
+  },
 
-  const logout = async () => {
+  logout: async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      setUser(null);
+      await axiosInstance.post('/api/v1/auth/logout');
+      localStorage.removeItem('token');
+      Cookies.remove('token');
+      set({ user: null, isAuthenticated: false });
     } catch (error) {
       console.error('Logout error:', error);
     }
-  };
+  },
 
-  const isAuthenticated = () => !!user;
-
-  useEffect(() => {
-    verifyAuth();
-  }, []);
-
-  return {
-    user,
-    loading,
-    login,
-    logout,
-    isAuthenticated,
-    verifyAuth
-  };
-}; 
+  checkAuth: async () => {
+    try {
+      const response = await axiosInstance.get('/api/v1/auth/me');
+      const { user } = response.data;
+      set({ user, isAuthenticated: true, isLoading: false });
+    } catch (error) {
+      localStorage.removeItem('token');
+      Cookies.remove('token');
+      set({ user: null, isAuthenticated: false, isLoading: false });
+    }
+  },
+})); 
