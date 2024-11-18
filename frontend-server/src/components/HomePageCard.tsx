@@ -1,7 +1,12 @@
 "use client";
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import CourseCatalog from './features/CourseCatalog';
+import Documentation from './features/Documentation';
+import ProjectsHub from './features/ProjectsHub';
+import ResourceLibrary from './features/ResourceLibrary';
+import CommunityForum from './features/CommunityForum';
 
 interface DataPoint {
   name: string;
@@ -22,18 +27,35 @@ const data: DataPoint[] = [
 ];
 
 const tabs = [
-  { id: 'code', label: 'Code' },
-  { id: 'plan', label: 'Plan' },
-  { id: 'collaborate', label: 'Collaborate' },
-  { id: 'automate', label: 'Automate' },
-  { id: 'secure', label: 'Secure' },
+  { id: 'courses', label: 'Explore Courses' },
+  { id: 'documentation', label: 'Learn From Documentation' },
+  { id: 'projects', label: 'Engineering Projects Hub' },
+  { id: 'resources', label: 'Resource Library' },
+  { id: 'community', label: 'User Community Forum' },
 ];
 
 const HomePageCard = () => {
-  const [activeTab, setActiveTab] = useState('code');
+  const [activeTab, setActiveTab] = useState('courses');
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'courses':
+        return <CourseCatalog />;
+      case 'documentation':
+        return <Documentation />;
+      case 'projects':
+        return <ProjectsHub />;
+      case 'resources':
+        return <ResourceLibrary />;
+      case 'community':
+        return <CommunityForum />;
+      default:
+        return <CourseCatalog />;
+    }
+  };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4">
+    <div className="w-full max-w-7xl mx-auto px-4">
       <motion.div 
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -118,6 +140,20 @@ const HomePageCard = () => {
                 </button>
               ))}
             </div>
+
+            {/* Tab Content */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="min-h-[400px]"
+              >
+                {renderTabContent()}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>
