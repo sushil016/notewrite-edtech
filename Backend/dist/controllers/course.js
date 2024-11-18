@@ -73,13 +73,14 @@ const getTeacherCourses = async (req, res) => {
                 students: true
             }
         });
+        console.log('Found courses:', courses);
         res.status(200).json({
             success: true,
             data: courses
         });
     }
     catch (error) {
-        console.error(error);
+        console.error('Error in getTeacherCourses:', error);
         res.status(500).json({
             success: false,
             message: "Error fetching courses"

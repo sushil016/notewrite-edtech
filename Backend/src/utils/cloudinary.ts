@@ -1,5 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
-import { UploadedFile } from 'express-fileupload';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,15 +6,18 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-export const uploadToCloudinary = async (file: UploadedFile, folder: string) => {
+export const uploadToCloudinary = async (
+    filePath: string, 
+    folder: string
+): Promise<UploadApiResponse | null> => {
     try {
-        const result = await cloudinary.uploader.upload(file.tempFilePath, {
+        const result = await cloudinary.uploader.upload(filePath, {
             folder,
             resource_type: "auto"
         });
         return result;
     } catch (error) {
-        console.error("Cloudinary upload error:", error);
-        throw error;
+        console.error('Cloudinary upload error:', error);
+        return null;
     }
 }; 

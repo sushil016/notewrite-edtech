@@ -6,9 +6,7 @@ import * as z from 'zod';
 import { MovingButton } from '@/components/ui/moving-border'
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { API_BASE_URL } from '@/config/api';
-import axios from 'axios';
-
+import axiosInstance from '@/lib/axios';
 
 const sectionSchema = z.object({
   sectionName: z.string().min(3, 'Section name must be at least 3 characters'),
@@ -30,7 +28,7 @@ export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
 
   const onSubmit = async (data: SectionFormData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/v1/sections/create`, {
+      const response = await axiosInstance.post('/api/v1/sections/create', {
         ...data,
         courseId
       });
@@ -46,15 +44,15 @@ export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Create Course Sections</h2>
+      <h2 className="text-xl font-semibold text-white">Create Course Sections</h2>
       
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2">Section Name</label>
+          <label className="block text-sm font-medium text-gray-200 mb-2">Section Name</label>
           <Input
             {...register('sectionName')}
             placeholder="Enter section name"
-            className={errors.sectionName ? 'border-red-500' : ''}
+            className={`bg-white/5 border-gray-700 text-white ${errors.sectionName ? 'border-red-500' : ''}`}
           />
           {errors.sectionName && (
             <p className="text-red-500 text-sm mt-1">{errors.sectionName.message}</p>
@@ -65,11 +63,11 @@ export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
       </form>
 
       <div className="mt-6">
-        <h3 className="text-lg font-medium mb-4">Added Sections</h3>
+        <h3 className="text-lg font-medium mb-4 text-white">Added Sections</h3>
         {sections.map((section) => (
           <div
             key={section.id}
-            className="p-4 border rounded-lg mb-3 flex justify-between items-center"
+            className="p-4 border border-gray-700 rounded-lg mb-3 flex justify-between items-center bg-white/5 text-white"
           >
             <span>{section.sectionName}</span>
             <MovingButton

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -7,6 +7,7 @@ import { MovingButton } from '@/components/ui/moving-border'
 import { Input } from '@/components/ui/input';
 import TextArea from '@/components/ui/textArea';
 import { toast } from 'sonner';
+import axiosInstance from '@/lib/axios';
 
 const subSectionSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -25,21 +26,26 @@ interface SubSectionCreatorProps {
 export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorProps) {
   const [sections, setSections] = useState<Array<{ id: string; sectionName: string }>>([]);
   const [selectedSection, setSelectedSection] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<SubSectionFormData>({
     resolver: zodResolver(subSectionSchema)
   });
 
-  // Fetch sections when component mounts
+  useEffect(() => {
+    fetchSections();
+  }, [courseId]);
+
   const fetchSections = async () => {
     try {
-      const response = await fetch(`/api/sections/${courseId}`);
-      if (!response.ok) throw new Error('Failed to fetch sections');
-      const data = await response.json();
-      setSections(data.data);
+      setLoading(true);
+      const response = await axiosInstance.get(`/api/v1/sections/course/${courseId}`);
+      setSections(response.data.data);
     } catch (error) {
       toast.error('Error fetching sections');
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,33 +63,47 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
       formData.append('sectionId', selectedSection);
       formData.append('videoFile', data.videoFile[0]);
 
-      const response = await fetch('/api/subsections/create', {
-        method: 'POST',
-        body: formData,
+      const response = await axiosInstance.post('/api/v1/subsections/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create subsection');
+      if (response.data.success) {
+        reset();
+        toast.success('Subsection created successfully');
       }
-
-      reset();
-      toast.success('Subsection created successfully');
     } catch (error) {
       toast.error('Error creating subsection');
       console.error(error);
     }
   };
 
+  if (loading) {
+    return <div className="text-center text-white">Loading sections...</div>;
+  }
+
+  if (sections.length === 0) {
+    return (
+      <div className="text-center text-white">
+        <p>No sections found. Please create a section first.</p>
+        <MovingButton onClick={() => window.history.back()} className="mt-4">
+          Go Back
+        </MovingButton>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Add Course Content</h2>
+      <h2 className="text-xl font-semibold text-white">Add Course Content</h2>
       
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">Select Section</label>
+        <label className="block text-sm font-medium text-gray-200 mb-2">Select Section</label>
         <select
           value={selectedSection}
           onChange={(e) => setSelectedSection(e.target.value)}
-          className="w-full p-2 border rounded-md"
+          className="w-full p-2 rounded-md bg-white/5 border border-gray-700 text-white"
         >
           <option value="">Select a section</option>
           {sections.map((section) => (

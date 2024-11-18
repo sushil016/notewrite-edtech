@@ -7,17 +7,17 @@ cloudinary_1.v2.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
-const uploadToCloudinary = async (file, folder) => {
+const uploadToCloudinary = async (filePath, folder) => {
     try {
-        const result = await cloudinary_1.v2.uploader.upload(file.tempFilePath, {
+        const result = await cloudinary_1.v2.uploader.upload(filePath, {
             folder,
             resource_type: "auto"
         });
         return result;
     }
     catch (error) {
-        console.error("Cloudinary upload error:", error);
-        throw error;
+        console.error('Cloudinary upload error:', error);
+        return null;
     }
 };
 exports.uploadToCloudinary = uploadToCloudinary;
