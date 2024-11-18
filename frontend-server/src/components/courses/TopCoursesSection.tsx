@@ -35,7 +35,7 @@ export const TopCoursesSection: React.FC<TopCoursesSectionProps> = ({ courses })
   return (
     <section className="py-12 bg-zinc-90 text-gray-100 z-10">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">Top Documantation</h2>
+        <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">Top Courses</h2>
         <div className="relative">
           <div className="flex overflow-hidden">
             {courses.map((course, index) => (

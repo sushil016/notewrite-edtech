@@ -71,7 +71,9 @@ const Navbar = () => {
           >
             Services
           </button>
-          <button className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150">
+          <button
+            onClick={() => router.push("/courses")}
+           className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150">
             Courses
           </button>
           <button

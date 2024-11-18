@@ -21,11 +21,11 @@ const Footer = () => {
   };
 
   return (
-    <footer className="w-full bg-[#0F172A]/95 text-white">
+    <footer className="w-full bg-[#0F172A]/95 text-white z-50">
       <Line />
       
       {/* Newsletter Section */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 z-80 relative">
         <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-lg p-6 mb-12">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-bold mb-2">Subscribe to Our Newsletter</h3>
