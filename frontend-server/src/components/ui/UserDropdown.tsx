@@ -7,7 +7,8 @@ import {
   FaBook, 
   FaCog, 
   FaSignOutAlt,
-  FaChevronDown 
+  FaChevronDown,
+  FaTachometerAlt 
 } from 'react-icons/fa';
 import Link from 'next/link';
 
@@ -74,6 +75,23 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ user }) => {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
           <div className="py-1" role="menu">
+            {/* Dashboard Links based on accountType */}
+            {user.accountType === 'TEACHER' && (
+              <Link
+                href="/teacher/dashboard"
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <FaTachometerAlt className="mr-3" /> Teacher Dashboard
+              </Link>
+            )}
+            {user.accountType === 'ADMIN' && (
+              <Link
+                href="/admin/dashboard"
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <FaTachometerAlt className="mr-3" /> Admin Dashboard
+              </Link>
+            )}
             <Link
               href="/profile"
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

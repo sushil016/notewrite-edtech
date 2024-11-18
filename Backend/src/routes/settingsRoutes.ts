@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express'
-import { authenticateUser } from '../middlewares/auth'
+import { authenticateUser } from '../middlewares/authMiddleware'
 import {
   getUserSettings,
   updateSettings,

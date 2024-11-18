@@ -1,28 +1,14 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
+const express_1 = require("express");
 const course_1 = require("../controllers/course");
 const authMiddleware_1 = require("../middlewares/authMiddleware");
-const router = express_1.default.Router();
-// Create type-safe middleware wrappers
-const authMiddleware = async (req, res, next) => {
-    try {
-        await (0, authMiddleware_1.auth)(req, res, next);
-    }
-    catch (error) {
-        next(error);
-    }
+const router = (0, express_1.Router)();
+// Type-safe wrapper for async handlers with AuthRequest
+const asyncHandler = (fn) => (req, res, next) => {
+    Promise.resolve(fn(req, res)).catch(next);
 };
-const instructorMiddleware = async (req, res, next) => {
-    try {
-        await (0, authMiddleware_1.isInstructor)(req, res, next);
-    }
-    catch (error) {
-        next(error);
-    }
-};
-router.post('/create', authMiddleware, instructorMiddleware, course_1.createCourse);
+router.post('/create', authMiddleware_1.authenticateUser, authMiddleware_1.isTeacher, asyncHandler(course_1.createCourse));
+router.get('/teacher-courses', authMiddleware_1.authenticateUser, authMiddleware_1.isTeacher, asyncHandler(course_1.getTeacherCourses));
+router.get('/:courseId', authMiddleware_1.authenticateUser, authMiddleware_1.isTeacher, asyncHandler(course_1.getCourseDetails));
 exports.default = router;

@@ -1,13 +1,12 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { UserInput, LoginInput } from '../types/user';
+import { UserInput } from '../types/user';
 import { sendMail } from '../utils/mailSender';
+import { prisma } from '../app';
 
-const prisma = new PrismaClient();
-
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
       firstName,
@@ -21,17 +20,19 @@ export const signup = async (req: Request, res: Response) => {
 
     // Validation
     if (!firstName || !lastName || !email || !password || !confirmPassword || !contactNumber) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Please fill all required fields",
       });
+      return;
     }
 
     if (password !== confirmPassword) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Passwords do not match",
       });
+      return;
     }
 
     // Check if user exists
@@ -40,10 +41,11 @@ export const signup = async (req: Request, res: Response) => {
     });
 
     if (existingUser) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "User already exists",
       });
+      return;
     }
 
     // Verify OTP
@@ -53,10 +55,11 @@ export const signup = async (req: Request, res: Response) => {
     });
 
     if (!recentOTP || recentOTP.otp !== req.body.otp) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Invalid OTP",
       });
+      return;
     }
 
     // Create profile
@@ -84,7 +87,7 @@ export const signup = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       message: "User created successfully",
       user: {
@@ -94,127 +97,92 @@ export const signup = async (req: Request, res: Response) => {
         lastName: user.lastName,
       },
     });
-
   } catch (error) {
-    console.error("Signup error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    next(error);
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide email and password",
-      });
-    }
-
     const user = await prisma.user.findUnique({
-      where: { email },
-      include: { profile: true },
+      where: { email }
     });
 
     if (!user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
-        message: "User not found",
+        message: 'Invalid email or password'
       });
+      return;
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      res.status(401).json({
         success: false,
-        message: "Invalid password",
+        message: 'Invalid email or password'
       });
+      return;
     }
 
-    // Generate token with all necessary information
+    // Generate token with proper payload
     const token = jwt.sign(
       { 
         id: user.id,
         email: user.email,
-        accountType: user.accountType
+        accountType: user.accountType 
       },
       process.env.JWT_SECRET!,
       { expiresIn: '24h' }
     );
 
-    // Set cookie with proper options
+    // Set token in both cookie and response
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      path: '/'  // Add this to ensure cookie is available for all paths
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
 
-    // Send response
-    return res.status(200).json({
+    res.json({
       success: true,
-      message: 'Login successful',
+      token,
       user: {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        accountType: user.accountType
+        accountType: user.accountType,
       }
     });
   } catch (error) {
-    console.error("Login error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    next(error);
   }
 };
 
-export const verifyAuth = async (req: Request, res: Response) => {
+export const verifyAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const userId = req.user?.id;
-    
-    if (!userId) {
-      return res.status(401).json({
+    if (!req.user) {
+      res.status(401).json({
         success: false,
-        message: "Not authenticated"
+        message: 'User not authenticated'
       });
+      return;
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        accountType: true
+    res.json({
+      success: true,
+      user: {
+        id: req.user.id,
+        email: req.user.email,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        accountType: req.user.accountType,
       }
     });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      user
-    });
   } catch (error) {
-    console.error("Verify auth error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error"
-    });
+    next(error);
   }
 };

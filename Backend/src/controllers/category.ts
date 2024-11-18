@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { AuthRequest } from '../middlewares/authMiddleware';
+import { authenticateUser } from '../middlewares/authMiddleware';
 
 const prisma = new PrismaClient();
 
 export const createCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { name, description } = req.body;
-        const userId = (req as AuthRequest).user?.id;
+        const userId = (req as any).user?.id;
 
         if (!userId) {
             res.status(401).json({

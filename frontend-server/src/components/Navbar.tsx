@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import Link from "next/link";
@@ -13,9 +13,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function Navbar() {
   const gsapRef = useRef<HTMLDivElement>(null);
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, checkAuth } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   useGSAP(() => {
     if (gsapRef.current) {
@@ -89,10 +93,10 @@ export function Navbar() {
           ) : isAuthenticated && user ? (
             <UserDropdown
               user={{
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                accountType: user.accountType,
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                email: user.email || '',
+                accountType: user.accountType || 'STUDENT',
               }}
             />
           ) : (

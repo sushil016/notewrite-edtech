@@ -4,44 +4,55 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.changePassword = void 0;
-const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const mailSender_1 = require("../utils/mailSender");
-const prisma = new client_1.PrismaClient();
-const changePassword = async (req, res) => {
+const app_1 = require("../app");
+const changePassword = async (req, res, next) => {
+    var _a;
     try {
         const { oldPassword, newPassword, confirmNewPassword } = req.body;
-        const userId = req.user.id; // Assuming you have authentication middleware
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            res.status(401).json({
+                success: false,
+                message: "Authentication required",
+            });
+            return;
+        }
         if (newPassword !== confirmNewPassword) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "New password and confirm password do not match",
             });
+            return;
         }
-        const user = await prisma.user.findUnique({
+        const user = await app_1.prisma.user.findUnique({
             where: { id: userId },
         });
         if (!user) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: "User not found",
             });
+            return;
         }
         const isOldPasswordValid = await bcrypt_1.default.compare(oldPassword, user.password);
         if (!isOldPasswordValid) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 message: "Old password is incorrect",
             });
+            return;
         }
         if (oldPassword === newPassword) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "New password cannot be same as old password",
             });
+            return;
         }
         const hashedNewPassword = await bcrypt_1.default.hash(newPassword, 10);
-        await prisma.user.update({
+        await app_1.prisma.user.update({
             where: { id: userId },
             data: { password: hashedNewPassword },
         });
@@ -51,17 +62,13 @@ const changePassword = async (req, res) => {
             subject: "Password Updated Successfully",
             text: "Your password has been successfully updated. If you didn't make this change, please contact support immediately.",
         });
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             message: "Password updated successfully",
         });
     }
     catch (error) {
-        console.error("Change password error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Error changing password",
-        });
+        next(error);
     }
 };
 exports.changePassword = changePassword;

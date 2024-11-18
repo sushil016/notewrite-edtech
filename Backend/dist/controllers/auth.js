@@ -4,49 +4,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyAuth = exports.login = exports.signup = void 0;
-const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const prisma = new client_1.PrismaClient();
-const signup = async (req, res) => {
+const app_1 = require("../app");
+const signup = async (req, res, next) => {
     try {
         const { firstName, lastName, email, password, confirmPassword, contactNumber, accountType, } = req.body;
         // Validation
         if (!firstName || !lastName || !email || !password || !confirmPassword || !contactNumber) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "Please fill all required fields",
             });
+            return;
         }
         if (password !== confirmPassword) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "Passwords do not match",
             });
+            return;
         }
         // Check if user exists
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await app_1.prisma.user.findUnique({
             where: { email },
         });
         if (existingUser) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "User already exists",
             });
+            return;
         }
         // Verify OTP
-        const recentOTP = await prisma.oTP.findFirst({
+        const recentOTP = await app_1.prisma.oTP.findFirst({
             where: { email },
             orderBy: { createdAt: 'desc' },
         });
         if (!recentOTP || recentOTP.otp !== req.body.otp) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "Invalid OTP",
             });
+            return;
         }
         // Create profile
-        const profile = await prisma.profile.create({
+        const profile = await app_1.prisma.profile.create({
             data: {
                 gender: null,
                 dateOfBirth: null,
@@ -56,7 +59,7 @@ const signup = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt_1.default.hash(password, 10);
         // Create user
-        const user = await prisma.user.create({
+        const user = await app_1.prisma.user.create({
             data: {
                 firstName,
                 lastName,
@@ -67,7 +70,7 @@ const signup = async (req, res) => {
                 profileId: profile.id,
             },
         });
-        return res.status(201).json({
+        res.status(201).json({
             success: true,
             message: "User created successfully",
             user: {
@@ -79,113 +82,83 @@ const signup = async (req, res) => {
         });
     }
     catch (error) {
-        console.error("Signup error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error",
-        });
+        next(error);
     }
 };
 exports.signup = signup;
-const login = async (req, res) => {
+const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide email and password",
-            });
-        }
-        const user = await prisma.user.findUnique({
-            where: { email },
-            include: { profile: true },
+        const user = await app_1.prisma.user.findUnique({
+            where: { email }
         });
         if (!user) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
-                message: "User not found",
+                message: 'Invalid email or password'
             });
+            return;
         }
-        const isPasswordValid = await bcrypt_1.default.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({
+        const validPassword = await bcrypt_1.default.compare(password, user.password);
+        if (!validPassword) {
+            res.status(401).json({
                 success: false,
-                message: "Invalid password",
+                message: 'Invalid email or password'
             });
+            return;
         }
-        // Generate token with all necessary information
+        // Generate token with proper payload
         const token = jsonwebtoken_1.default.sign({
             id: user.id,
             email: user.email,
             accountType: user.accountType
         }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        // Set cookie with proper options
+        // Set token in both cookie and response
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            maxAge: 24 * 60 * 60 * 1000, // 24 hours
-            path: '/' // Add this to ensure cookie is available for all paths
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
-        // Send response
-        return res.status(200).json({
+        res.json({
             success: true,
-            message: 'Login successful',
+            token,
             user: {
                 id: user.id,
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                accountType: user.accountType
+                accountType: user.accountType,
             }
         });
     }
     catch (error) {
-        console.error("Login error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error",
-        });
+        next(error);
     }
 };
 exports.login = login;
-const verifyAuth = async (req, res) => {
-    var _a;
+const verifyAuth = async (req, res, next) => {
     try {
-        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-        if (!userId) {
-            return res.status(401).json({
+        if (!req.user) {
+            res.status(401).json({
                 success: false,
-                message: "Not authenticated"
+                message: 'User not authenticated'
             });
+            return;
         }
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                id: true,
-                email: true,
-                firstName: true,
-                lastName: true,
-                accountType: true
-            }
-        });
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            });
-        }
-        return res.status(200).json({
+        res.json({
             success: true,
-            user
+            user: {
+                id: req.user.id,
+                email: req.user.email,
+                firstName: req.user.firstName,
+                lastName: req.user.lastName,
+                accountType: req.user.accountType,
+            }
         });
     }
     catch (error) {
-        console.error("Verify auth error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error"
-        });
+        next(error);
     }
 };
 exports.verifyAuth = verifyAuth;

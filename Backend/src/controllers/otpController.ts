@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { RequestHandler } from 'express';
 import { PrismaClient } from '@prisma/client';
 import otpGenerator from 'otp-generator';
 import { sendMail } from '../utils/mailSender';
@@ -6,7 +6,7 @@ import { otpVerificationTemplate } from '../utils/emailTemplates';
 
 const prisma = new PrismaClient();
 
-export const sendOTP = async (req: Request, res: Response): Promise<void> => {
+export const sendOTP: RequestHandler = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -66,7 +66,7 @@ export const sendOTP = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
+export const verifyOTP: RequestHandler = async (req, res) => {
   try {
     const { email, otp } = req.body;
 

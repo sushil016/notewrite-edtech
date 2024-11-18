@@ -1,12 +1,15 @@
 import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, AccountType } from '@prisma/client'
 import { uploadImageToCloudinary } from '../utils/imageUploader'
+import { AuthRequest } from '../types/express'
 
 interface AuthenticatedRequest extends Request {
   user: {
     id: string;
     email: string;
-    accountType: string;
+    firstName: string;
+    lastName: string;
+    accountType: AccountType;
   };
   file?: Express.Multer.File;
 }

@@ -3,54 +3,94 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isInstructor = exports.auth = void 0;
+exports.isStudent = exports.isAdmin = exports.isTeacher = exports.authenticateUser = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const app_1 = require("../app");
 const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
-const auth = async (req, res, next) => {
+const authenticateUser = async (req, res, next) => {
     var _a;
     try {
-        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '');
+        // Check both Authorization header and cookies
+        const authHeader = req.headers.authorization;
+        const token = (authHeader === null || authHeader === void 0 ? void 0 : authHeader.startsWith('Bearer '))
+            ? authHeader.substring(7)
+            : (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.token;
         if (!token) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
-                message: "Authentication token missing"
+                message: 'Access denied. No token provided.'
             });
+            return;
         }
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        const user = await prisma.user.findUnique({
-            where: { id: decoded.id }
-        });
-        if (!user) {
-            return res.status(401).json({
+        try {
+            const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+            const user = await app_1.prisma.user.findUnique({
+                where: { id: decoded.id },
+                select: {
+                    id: true,
+                    email: true,
+                    firstName: true,
+                    lastName: true,
+                    accountType: true,
+                }
+            });
+            if (!user) {
+                res.status(401).json({
+                    success: false,
+                    message: 'Invalid token. User not found.'
+                });
+                return;
+            }
+            req.user = user;
+            next();
+        }
+        catch (jwtError) {
+            console.error('JWT Verification Error:', jwtError);
+            res.status(401).json({
                 success: false,
-                message: "Invalid authentication token"
+                message: 'Invalid token format or signature.'
             });
+            return;
         }
-        req.user = {
-            id: user.id,
-            email: user.email,
-            accountType: user.accountType
-        };
-        next();
     }
     catch (error) {
-        return res.status(401).json({
-            success: false,
-            message: "Authentication failed"
-        });
+        next(error);
     }
 };
-exports.auth = auth;
-const isInstructor = (req, res, next) => {
+exports.authenticateUser = authenticateUser;
+const isTeacher = (req, res, next) => {
     var _a;
-    const authReq = req;
-    if (((_a = authReq.user) === null || _a === void 0 ? void 0 : _a.accountType) !== client_1.AccountType.TEACHER) {
-        return res.status(403).json({
+    if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.accountType) !== client_1.AccountType.TEACHER) {
+        res.status(403).json({
             success: false,
-            message: "Access denied. Instructor only."
+            message: 'Access denied. Teachers only.'
         });
+        return;
     }
     next();
 };
-exports.isInstructor = isInstructor;
+exports.isTeacher = isTeacher;
+const isAdmin = (req, res, next) => {
+    var _a;
+    if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.accountType) !== client_1.AccountType.ADMIN) {
+        res.status(403).json({
+            success: false,
+            message: 'Access denied. Admins only.'
+        });
+        return;
+    }
+    next();
+};
+exports.isAdmin = isAdmin;
+const isStudent = (req, res, next) => {
+    var _a;
+    if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.accountType) !== client_1.AccountType.STUDENT) {
+        res.status(403).json({
+            success: false,
+            message: 'Access denied. Students only.'
+        });
+        return;
+    }
+    next();
+};
+exports.isStudent = isStudent;

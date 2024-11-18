@@ -1,20 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createCourse = void 0;
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
-const createCourse = async (req, res, next) => {
-    var _a;
+exports.getCourseDetails = exports.getTeacherCourses = exports.createCourse = void 0;
+const mailSender_1 = require("../utils/mailSender");
+const app_1 = require("../app");
+const createCourse = async (req, res) => {
     try {
         const { courseName, courseDescription, whatYouWillLearn, tag, categoryId, instructions } = req.body;
-        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-        if (!userId) {
-            res.status(401).json({
-                success: false,
-                message: "Authentication required"
-            });
-            return;
-        }
+        const userId = req.user.id;
         if (!courseName || !courseDescription || !whatYouWillLearn || !categoryId) {
             res.status(400).json({
                 success: false,
@@ -22,13 +14,15 @@ const createCourse = async (req, res, next) => {
             });
             return;
         }
-        const course = await prisma.course.create({
+        const tagArray = Array.isArray(tag) ? tag : [tag];
+        const instructionsArray = Array.isArray(instructions) ? instructions : [instructions];
+        const course = await app_1.prisma.course.create({
             data: {
                 courseName,
                 courseDescription,
                 whatYouWillLearn,
-                tag,
-                instructions,
+                tag: tagArray,
+                instructions: instructionsArray,
                 teacher: {
                     connect: { id: userId }
                 },
@@ -40,6 +34,12 @@ const createCourse = async (req, res, next) => {
                 teacher: true,
                 category: true
             }
+        });
+        // Send email notification
+        await (0, mailSender_1.sendMail)({
+            email: req.user.email,
+            subject: "Course Created Successfully",
+            text: `Your course ${courseName} has been created successfully.`
         });
         res.status(200).json({
             success: true,
@@ -56,3 +56,74 @@ const createCourse = async (req, res, next) => {
     }
 };
 exports.createCourse = createCourse;
+const getTeacherCourses = async (req, res) => {
+    try {
+        const teacherId = req.user.id;
+        const courses = await app_1.prisma.course.findMany({
+            where: {
+                teacherId
+            },
+            include: {
+                sections: {
+                    include: {
+                        subSections: true
+                    }
+                },
+                category: true,
+                students: true
+            }
+        });
+        res.status(200).json({
+            success: true,
+            data: courses
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching courses"
+        });
+    }
+};
+exports.getTeacherCourses = getTeacherCourses;
+const getCourseDetails = async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const teacherId = req.user.id;
+        const course = await app_1.prisma.course.findFirst({
+            where: {
+                id: courseId,
+                teacherId
+            },
+            include: {
+                sections: {
+                    include: {
+                        subSections: true
+                    }
+                },
+                category: true,
+                students: true
+            }
+        });
+        if (!course) {
+            res.status(404).json({
+                success: false,
+                message: "Course not found"
+            });
+            return;
+        }
+        res.status(200).json({
+            success: true,
+            data: course
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching course details"
+        });
+    }
+};
+exports.getCourseDetails = getCourseDetails;

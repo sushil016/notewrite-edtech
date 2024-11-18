@@ -1,29 +1,19 @@
-import express, { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Router } from 'express';
 import { createCategory, getAllCategories, getCategoryById } from '../controllers/category';
-import { auth, isInstructor } from '../middlewares/authMiddleware';
+import { authenticateUser, isTeacher } from '../middlewares/authMiddleware';
+import { RequestHandler } from 'express';
 
-const router = express.Router();
+const router = Router();
 
-// Create type-safe middleware wrappers
-const authMiddleware: RequestHandler = async (req, res, next) => {
-    try {
-        await auth(req as Request, res, next);
-    } catch (error) {
-        next(error);
-    }
-};
+// Type-safe wrapper for async handlers
+const asyncHandler = (fn: RequestHandler): RequestHandler => 
+  (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
 
-const instructorMiddleware: RequestHandler = async (req, res, next) => {
-    try {
-        await isInstructor(req as Request, res, next);
-    } catch (error) {
-        next(error);
-    }
-};
-
-// Apply middleware wrappers to routes
-router.post('/create', authMiddleware, instructorMiddleware, createCategory as RequestHandler);
-router.get('/all', getAllCategories as RequestHandler);
-router.get('/:categoryId', getCategoryById as RequestHandler);
+// Apply middleware and wrap handlers
+router.post('/create', authenticateUser, isTeacher, asyncHandler(createCategory));
+router.get('/all', asyncHandler(getAllCategories));
+router.get('/:categoryId', asyncHandler(getCategoryById));
 
 export default router; 

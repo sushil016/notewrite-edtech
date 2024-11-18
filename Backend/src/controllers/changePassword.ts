@@ -1,21 +1,28 @@
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import { ChangePasswordInput } from '../types/user';
 import { sendMail } from '../utils/mailSender';
+import { prisma } from '../app';
 
-const prisma = new PrismaClient();
-
-export const changePassword = async (req: Request, res: Response) => {
+export const changePassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { oldPassword, newPassword, confirmNewPassword }: ChangePasswordInput = req.body;
-    const userId = (req as any).user.id; // Assuming you have authentication middleware
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+      return;
+    }
 
     if (newPassword !== confirmNewPassword) {
-      return res.status(400).json({
+       res.status(400).json({
         success: false,
         message: "New password and confirm password do not match",
       });
+      return;
     }
 
     const user = await prisma.user.findUnique({
@@ -23,26 +30,29 @@ export const changePassword = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({
+       res.status(404).json({
         success: false,
         message: "User not found",
       });
+      return;
     }
 
     const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
 
     if (!isOldPasswordValid) {
-      return res.status(401).json({
+       res.status(401).json({
         success: false,
         message: "Old password is incorrect",
       });
+      return;
     }
 
     if (oldPassword === newPassword) {
-      return res.status(400).json({
+       res.status(400).json({
         success: false,
         message: "New password cannot be same as old password",
       });
+      return;
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
@@ -59,16 +69,12 @@ export const changePassword = async (req: Request, res: Response) => {
       text: "Your password has been successfully updated. If you didn't make this change, please contact support immediately.",
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Password updated successfully",
     });
 
   } catch (error) {
-    console.error("Change password error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Error changing password",
-    });
+    next(error);
   }
 };

@@ -1,71 +1,43 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const cors_1 = __importDefault(require("cors"));
-const client_1 = require("@prisma/client");
-const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
-const profileRoutes_1 = __importDefault(require("./routes/profileRoutes"));
-const settingsRoutes_1 = __importDefault(require("./routes/settingsRoutes"));
-const category_1 = __importDefault(require("./routes/category"));
-const course_1 = __importDefault(require("./routes/course"));
-const payment_1 = __importDefault(require("./routes/payment"));
-const section_1 = __importDefault(require("./routes/section"));
-// import app from './app';
+const app_1 = __importStar(require("./app"));
 dotenv_1.default.config();
-const app = (0, express_1.default)();
-const prisma = new client_1.PrismaClient();
 const PORT = process.env.PORT || 8000;
-// Middleware
-app.use(express_1.default.json());
-app.use((0, cookie_parser_1.default)());
-app.use((0, cors_1.default)({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    exposedHeaders: ['set-cookie'],
-}));
-// Health check route
-app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'success',
-        message: 'Server is running'
-    });
-});
-// Routes
-app.use('/api/v1/auth', authRoutes_1.default);
-app.use('/api/profile', profileRoutes_1.default);
-app.use('/api/settings', settingsRoutes_1.default);
-app.use('/api/v1/categories', category_1.default);
-app.use('/api/courses', course_1.default);
-app.use('/api/payments', payment_1.default);
-app.use('/api/sections', section_1.default);
-// Add a test route to check token
-app.get('/api/test-auth', (req, res) => {
-    console.log('Cookies received:', req.cookies);
-    res.json({ cookies: req.cookies });
-});
-// Global error handler
-app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(err.status || 500).json({
-        success: false,
-        message: err.message || 'Internal server error',
-    });
-});
 // Database connection and server start
 const startServer = async () => {
     try {
         // Test database connection
-        await prisma.$connect();
+        await app_1.prisma.$connect();
         console.log('✅ Database connected successfully');
         // Start server
-        app.listen(PORT, () => {
+        app_1.default.listen(PORT, () => {
             console.log(`🚀 Server is running on port ${PORT}`);
         });
     }
@@ -89,6 +61,6 @@ startServer();
 // Cleanup on server shutdown
 process.on('SIGTERM', async () => {
     console.log('SIGTERM received. Shutting down gracefully...');
-    await prisma.$disconnect();
+    await app_1.prisma.$disconnect();
     process.exit(0);
 });

@@ -54,10 +54,17 @@ export const useAuth = create<AuthState>((set) => ({
 
   checkAuth: async () => {
     try {
+      const token = localStorage.getItem('token') || Cookies.get('token');
+      if (!token) {
+        set({ user: null, isAuthenticated: false, isLoading: false });
+        return;
+      }
+
       const response = await axiosInstance.get('/api/v1/auth/me');
       const { user } = response.data;
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {
+      console.error('Auth check error:', error);
       localStorage.removeItem('token');
       Cookies.remove('token');
       set({ user: null, isAuthenticated: false, isLoading: false });

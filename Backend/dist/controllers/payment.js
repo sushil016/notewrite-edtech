@@ -4,12 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyPayment = exports.capturePayment = void 0;
-const client_1 = require("@prisma/client");
 const razorpay_1 = __importDefault(require("razorpay"));
 const crypto_1 = __importDefault(require("crypto"));
 const mailSender_1 = require("../utils/mailSender");
 const emailTemplates_1 = require("../utils/emailTemplates");
-const prisma = new client_1.PrismaClient();
+const app_1 = require("../app");
 // Check if required environment variables are present
 if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_SECRET) {
     throw new Error('RAZORPAY_KEY_ID and RAZORPAY_SECRET must be present in environment variables');
@@ -19,11 +18,10 @@ const razorpay = new razorpay_1.default({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_SECRET
 });
-const capturePayment = async (req, res, next) => {
-    var _a;
+const capturePayment = async (req, res) => {
     try {
         const { courseId } = req.body;
-        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        const userId = req.user.id;
         if (!userId) {
             res.status(401).json({
                 success: false,
@@ -38,7 +36,7 @@ const capturePayment = async (req, res, next) => {
             });
             return;
         }
-        const course = await prisma.course.findFirst({
+        const course = await app_1.prisma.course.findFirst({
             where: {
                 id: courseId,
                 students: {
@@ -91,10 +89,10 @@ const capturePayment = async (req, res, next) => {
     }
 };
 exports.capturePayment = capturePayment;
-const verifyPayment = async (req, res, next) => {
+const verifyPayment = async (req, res) => {
     try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-        const { courseId, userId } = req.body.notes;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, notes } = req.body;
+        const { courseId, userId } = notes;
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSign = crypto_1.default
             .createHmac("sha256", process.env.RAZORPAY_SECRET)
@@ -108,8 +106,8 @@ const verifyPayment = async (req, res, next) => {
             return;
         }
         const [course, user] = await Promise.all([
-            prisma.course.findUnique({ where: { id: courseId } }),
-            prisma.user.findUnique({ where: { id: userId } })
+            app_1.prisma.course.findUnique({ where: { id: courseId } }),
+            app_1.prisma.user.findUnique({ where: { id: userId } })
         ]);
         if (!course || !user) {
             res.status(404).json({
@@ -118,7 +116,7 @@ const verifyPayment = async (req, res, next) => {
             });
             return;
         }
-        await prisma.course.update({
+        await app_1.prisma.course.update({
             where: { id: courseId },
             data: {
                 students: {
@@ -126,7 +124,7 @@ const verifyPayment = async (req, res, next) => {
                 }
             }
         });
-        await prisma.courseProgress.create({
+        await app_1.prisma.courseProgress.create({
             data: {
                 userId,
                 courseId

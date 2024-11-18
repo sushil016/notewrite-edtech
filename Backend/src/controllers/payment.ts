@@ -4,9 +4,8 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import { sendMail } from '../utils/mailSender';
 import { courseEnrollmentTemplate } from '../utils/emailTemplates';
-import { AuthRequest } from '../middlewares/authMiddleware';
-
-const prisma = new PrismaClient();
+import { AuthRequest } from '../types/express';
+import { prisma } from '../app';
 
 interface RazorpayOrderOptions {
     amount: number;
@@ -32,6 +31,24 @@ interface RazorpayOrderResponse {
     created_at: number;
 }
 
+interface VerifyPaymentBody {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    notes: {
+        courseId: string;
+        userId: string;
+    };
+}
+
+// Add interface for request body
+interface CapturePaymentBody {
+    courseId: string;
+}
+
+type CapturePaymentRequest = AuthRequest & { body: CapturePaymentBody };
+type VerifyPaymentRequest = AuthRequest & { body: VerifyPaymentBody };
+
 // Check if required environment variables are present
 if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_SECRET) {
     throw new Error('RAZORPAY_KEY_ID and RAZORPAY_SECRET must be present in environment variables');
@@ -43,10 +60,10 @@ const razorpay = new Razorpay({
     key_secret: process.env.RAZORPAY_SECRET as string
 });
 
-export const capturePayment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const capturePayment = async (req: CapturePaymentRequest, res: Response): Promise<void> => {
     try {
         const { courseId } = req.body;
-        const userId = (req as AuthRequest).user?.id;
+        const userId = req.user.id;
 
         if (!userId) {
             res.status(401).json({
@@ -119,10 +136,10 @@ export const capturePayment = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-export const verifyPayment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const verifyPayment = async (req: VerifyPaymentRequest, res: Response): Promise<void> => {
     try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-        const { courseId, userId } = req.body.notes;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, notes } = req.body;
+        const { courseId, userId } = notes;
 
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSign = crypto

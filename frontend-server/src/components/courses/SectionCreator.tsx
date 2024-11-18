@@ -6,7 +6,9 @@ import * as z from 'zod';
 import { MovingButton } from '@/components/ui/moving-border'
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import Button from '../buttons/Button';
+import { API_BASE_URL } from '@/config/api';
+import axios from 'axios';
+
 
 const sectionSchema = z.object({
   sectionName: z.string().min(3, 'Section name must be at least 3 characters'),
@@ -28,23 +30,12 @@ export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
 
   const onSubmit = async (data: SectionFormData) => {
     try {
-      const response = await fetch('/api/sections/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...data,
-          courseId
-        }),
+      const response = await axios.post(`${API_BASE_URL}/api/v1/sections/create`, {
+        ...data,
+        courseId
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create section');
-      }
-
-      const result = await response.json();
-      setSections([...sections, result.data]);
+      setSections([...sections, response.data.data]);
       reset();
       toast.success('Section created successfully');
     } catch (error) {
