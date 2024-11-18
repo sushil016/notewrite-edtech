@@ -7,6 +7,7 @@ exports.verifyOTP = exports.sendOTP = void 0;
 const client_1 = require("@prisma/client");
 const otp_generator_1 = __importDefault(require("otp-generator"));
 const mailSender_1 = require("../utils/mailSender");
+const emailTemplates_1 = require("../utils/emailTemplates");
 const prisma = new client_1.PrismaClient();
 const sendOTP = async (req, res) => {
     try {
@@ -40,18 +41,11 @@ const sendOTP = async (req, res) => {
                 expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
             },
         });
-        // Send email
+        // Send email with the new template
         await (0, mailSender_1.sendMail)({
             email,
-            subject: "Verify Your Email - NoteWrite",
-            text: `Your OTP for email verification is: ${otp}
-      
-This OTP will expire in 5 minutes.
-
-If you didn't request this OTP, please ignore this email.
-
-Best regards,
-NoteWrite Team`,
+            subject: "Verify Your Email - StudyNotion",
+            html: (0, emailTemplates_1.otpVerificationTemplate)(otp)
         });
         res.status(200).json({
             success: true,

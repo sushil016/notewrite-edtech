@@ -11,6 +11,11 @@ const client_1 = require("@prisma/client");
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const profileRoutes_1 = __importDefault(require("./routes/profileRoutes"));
 const settingsRoutes_1 = __importDefault(require("./routes/settingsRoutes"));
+const category_1 = __importDefault(require("./routes/category"));
+const course_1 = __importDefault(require("./routes/course"));
+const payment_1 = __importDefault(require("./routes/payment"));
+const section_1 = __importDefault(require("./routes/section"));
+// import app from './app';
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const prisma = new client_1.PrismaClient();
@@ -36,6 +41,10 @@ app.get('/health', (req, res) => {
 app.use('/api/v1/auth', authRoutes_1.default);
 app.use('/api/profile', profileRoutes_1.default);
 app.use('/api/settings', settingsRoutes_1.default);
+app.use('/api/v1/categories', category_1.default);
+app.use('/api/courses', course_1.default);
+app.use('/api/payments', payment_1.default);
+app.use('/api/sections', section_1.default);
 // Add a test route to check token
 app.get('/api/test-auth', (req, res) => {
     console.log('Cookies received:', req.cookies);

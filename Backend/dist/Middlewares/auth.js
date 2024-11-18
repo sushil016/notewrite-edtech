@@ -7,10 +7,9 @@ exports.isAdminOrInstructor = exports.isStudent = exports.isInstructor = exports
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
-const authenticateUser = (req, res, next) => {
+const authenticateUser = async (req, res, next) => {
     try {
         const token = req.cookies.token;
-        console.log('Received token:', token);
         if (!token) {
             res.status(401).json({
                 success: false,
@@ -19,14 +18,24 @@ const authenticateUser = (req, res, next) => {
             return;
         }
         try {
-            // Make sure JWT_SECRET is available
             const secret = process.env.JWT_SECRET;
             if (!secret) {
                 throw new Error('JWT_SECRET is not defined');
             }
             const decoded = jsonwebtoken_1.default.verify(token, secret);
-            console.log('Decoded token:', decoded);
             req.user = decoded;
+            // Verify user exists in database
+            const user = await prisma.user.findUnique({
+                where: { id: decoded.id },
+                select: {
+                    id: true,
+                    email: true,
+                    accountType: true,
+                },
+            });
+            if (!user) {
+                throw new Error('User not found');
+            }
             next();
         }
         catch (error) {
@@ -34,7 +43,6 @@ const authenticateUser = (req, res, next) => {
             res.status(401).json({
                 success: false,
                 message: 'Token is not valid',
-                error: error instanceof Error ? error.message : 'Unknown error',
             });
         }
     }

@@ -6,6 +6,11 @@ import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes'
 import settingsRoutes from './routes/settingsRoutes'
+import categoryRoutes from './routes/category'
+import courseRoutes from './routes/course'
+import paymentRoutes from './routes/payment'
+import sectionRoutes from './routes/section'
+// import app from './app';
 
 dotenv.config();
 
@@ -36,6 +41,10 @@ app.get('/health', (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/profile', profileRoutes)
 app.use('/api/settings', settingsRoutes)
+app.use('/api/v1/categories', categoryRoutes)
+app.use('/api/courses', courseRoutes)
+app.use('/api/payments', paymentRoutes)
+app.use('/api/sections', sectionRoutes)
 
 // Add a test route to check token
 app.get('/api/test-auth', (req, res) => {

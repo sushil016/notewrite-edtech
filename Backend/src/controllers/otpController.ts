@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import otpGenerator from 'otp-generator';
 import { sendMail } from '../utils/mailSender';
+import { otpVerificationTemplate } from '../utils/emailTemplates';
 
 const prisma = new PrismaClient();
 
@@ -43,18 +44,11 @@ export const sendOTP = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
-    // Send email
+    // Send email with the new template
     await sendMail({
       email,
-      subject: "Verify Your Email - NoteWrite",
-      text: `Your OTP for email verification is: ${otp}
-      
-This OTP will expire in 5 minutes.
-
-If you didn't request this OTP, please ignore this email.
-
-Best regards,
-NoteWrite Team`,
+      subject: "Verify Your Email - StudyNotion",
+      html: otpVerificationTemplate(otp)
     });
 
     res.status(200).json({
