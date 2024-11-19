@@ -3,13 +3,11 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
 import { Roboto } from "next/font/google";
 import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
-const roboto = Roboto( {weight: '300', subsets: ['latin']})
-
+const roboto = Roboto({ weight: '300', subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: "NoteWrite",
@@ -24,13 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
-
-          <Providers>
-            <Navbar/>            
-               {children}          
-            <Footer />
-          </Providers>
-   
+        <Providers>
+          <Navbar/>            
+          {children}          
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

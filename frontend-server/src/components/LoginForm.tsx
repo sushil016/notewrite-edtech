@@ -48,7 +48,7 @@ export function LoginForm() {
         switch (response.user.accountType) {
           case 'ADMIN':
           case 'TEACHER':
-            router.push('/dashboard');
+            router.push('/');
             break;
           case 'STUDENT':
           default:

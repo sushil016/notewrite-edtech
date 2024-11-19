@@ -1,18 +1,22 @@
-export interface Instructor {
-    name: string;
-    photo: string;
-  }
-  
-  export interface Course {
+export type AccountType = 'ADMIN' | 'TEACHER' | 'STUDENT';
+
+export interface Course {
+  id: string;
+  courseName: string;
+  courseDescription: string;
+  whatYouWillLearn: string;
+  status: 'DRAFT' | 'PUBLISHED';
+  price: number;
+  tag: string[];
+  instructions: string[];
+  teacher?: {
+    firstName: string;
+    lastName: string;
+    accountType: AccountType;
+  };
+  category?: {
     id: string;
-    title: string;
-    description: string;
-    instructor: Instructor;
-    rating: number;
-    enrolledStudents: number;
-    thumbnail: string;
-    duration: string;
-    difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-    price: number;
-    category: string;
-  }
+    name: string;
+  };
+  students?: any[];
+}

@@ -127,7 +127,10 @@ export default function TeacherCourses() {
                                             </MovingButton>
                                         )}
                                         <MovingButton
-                                            onClick={() => router.push(`/teacher/courses/${course.id}`)}
+                                            onClick={(e: any) => {
+                                                e.stopPropagation();
+                                                router.push(`/teacher/courses/${course.id}/edit`);
+                                            }}
                                             className="flex items-center justify-center"
                                         >
                                             <FaEdit className="w-5 h-5" />

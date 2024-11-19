@@ -8,12 +8,13 @@ import { Input } from '@/components/ui/input';
 import TextArea from '@/components/ui/textArea';
 import { toast } from 'sonner';
 import axiosInstance from '@/lib/axios';
+import { useRouter } from 'next/navigation';
 
 const subSectionSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   timeDuration: z.string().min(1, 'Duration is required'),
-  videoFile: z.any().refine((file) => file?.length === 1, 'Video file is required')
+  video: z.any().refine((file) => file?.length === 1, 'Video file is required')
 });
 
 type SubSectionFormData = z.infer<typeof subSectionSchema>;
@@ -32,22 +33,24 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
     resolver: zodResolver(subSectionSchema)
   });
 
+  const router = useRouter();
+
   useEffect(() => {
+    const fetchSections = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(`/api/v1/sections/course/${courseId}`);
+        setSections(response.data.data);
+      } catch (error) {
+        toast.error('Error fetching sections');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSections();
   }, [courseId]);
-
-  const fetchSections = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosInstance.get(`/api/v1/sections/course/${courseId}`);
-      setSections(response.data.data);
-    } catch (error) {
-      toast.error('Error fetching sections');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const onSubmit = async (data: SubSectionFormData) => {
     try {
@@ -61,7 +64,7 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
       formData.append('description', data.description);
       formData.append('timeDuration', data.timeDuration);
       formData.append('sectionId', selectedSection);
-      formData.append('videoFile', data.videoFile[0]);
+      formData.append('video', data.video[0]);
 
       const response = await axiosInstance.post('/api/v1/subsections/create', formData, {
         headers: {
@@ -157,18 +160,22 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
           <Input
             type="file"
             accept="video/*"
-            {...register('videoFile')}
-            className={errors.videoFile ? 'border-red-500' : ''}
+            {...register('video')}
+            className={errors.video ? 'border-red-500' : ''}
           />
-          {errors.videoFile && (
-            <p className="text-red-500 text-sm mt-1">{errors.videoFile.message?.toString()}</p>
+          {errors.video && (
+            <p className="text-red-500 text-sm mt-1">{errors.video.message?.toString()}</p>
           )}
         </div>
 
         <div className="flex justify-between">
           <MovingButton type="submit">Add Subsection</MovingButton>
-          <MovingButton type="button" onClick={onComplete} variant="outline">
-            Complete Course Creation
+          <MovingButton 
+            type="button" 
+            onClick={() => router.push(`/teacher/courses/${courseId}/review`)} 
+            variant="outline"
+          >
+            Review Course
           </MovingButton>
         </div>
       </form>

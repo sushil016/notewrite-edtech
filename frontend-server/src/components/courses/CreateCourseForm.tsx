@@ -18,6 +18,7 @@ const courseSchema = z.object({
   courseName: z.string().min(3, 'Course name must be at least 3 characters'),
   courseDescription: z.string().min(10, 'Description must be at least 10 characters'),
   whatYouWillLearn: z.string().min(10, 'Learning outcomes must be at least 10 characters'),
+  price: z.number().min(0, 'Price must be 0 or greater'),
   categoryId: z.string().min(1, 'Category is required'),
   tag: z.array(z.string()).min(1, 'At least one tag is required'),
   instructions: z.array(z.string()).min(1, 'At least one instruction is required')
@@ -162,6 +163,20 @@ export default function CreateCourseForm() {
                 />
                 {errors.whatYouWillLearn && (
                   <p className="text-red-500 text-sm mt-1">{errors.whatYouWillLearn.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-200 mb-2">Course Price (₹)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...register('price', { valueAsNumber: true })}
+                  placeholder="Enter course price (0 for free course)"
+                  className={`bg-white/5 border-gray-700 text-white ${errors.price ? 'border-red-500' : ''}`}
+                />
+                {errors.price && (
+                  <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>
                 )}
               </div>
 

@@ -19,20 +19,21 @@ export default function TeacherDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await axiosInstance.get('/api/v1/courses/teacher-courses');
-        console.log('Response:', response.data);
-        setCourses(response.data.data);
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCourses();
   }, []);
+
+  const fetchCourses = async () => {
+    try {
+      console.log('Fetching courses...');
+      const response = await axiosInstance.get('/api/v1/courses/teacher-courses');
+      console.log('Response:', response.data);
+      setCourses(response.data.data);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ProtectedRoute allowedRoles={['TEACHER']}>
@@ -42,7 +43,7 @@ export default function TeacherDashboard() {
             <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
             <div className="flex gap-4">
               <MovingButton onClick={() => router.push('/teacher/my-courses')}>
-                My Courses
+                Edit / Review Courses
               </MovingButton>
               <MovingButton onClick={() => router.push('/teacher/createCourse')}>
                 Create New Course
@@ -60,7 +61,8 @@ export default function TeacherDashboard() {
                 courses.map((course) => (
                   <div
                     key={course.id}
-                    className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"
+                    onClick={() => router.push(`/teacher/courses/${course.id}/review`)}
+                    className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md cursor-pointer hover:shadow-xl transition-shadow"
                   >
                     <h3 className="text-lg font-semibold mb-2">{course.courseName}</h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-4">
