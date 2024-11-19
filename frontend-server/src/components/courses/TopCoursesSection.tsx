@@ -6,11 +6,15 @@ import { CourseCard } from './CourseCard';
 import axiosInstance from '@/lib/axios';
 import { toast } from 'sonner';
 
-export const TopCoursesSection = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
+interface TopCoursesSectionProps {
+  courses: Course[];
+}
+
+export const TopCoursesSection: React.FC<TopCoursesSectionProps> = ({ courses: initialCourses }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [direction, setDirection] = useState(0);
+  const [courses, setCourses] = useState(initialCourses);
 
   useEffect(() => {
     fetchRecentCourses();

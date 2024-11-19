@@ -54,7 +54,7 @@ const createSubSection = async (req, res) => {
                 description,
                 timeDuration,
                 videoUrl: videoResult.secure_url,
-                notesUrls,
+                notesUrls: notesUrls || [],
                 section: {
                     connect: { id: sectionId }
                 }

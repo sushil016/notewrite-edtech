@@ -13,13 +13,12 @@ export const signup = async (req: Request, res: Response, next: NextFunction): P
       lastName,
       email,
       password,
-      confirmPassword,
       contactNumber,
       accountType,
     }: UserInput = req.body;
 
     // Validation
-    if (!firstName || !lastName || !email || !password || !confirmPassword || !contactNumber) {
+    if (!firstName || !lastName || !email || !password || !contactNumber) {
       res.status(400).json({
         success: false,
         message: "Please fill all required fields",
@@ -27,13 +26,14 @@ export const signup = async (req: Request, res: Response, next: NextFunction): P
       return;
     }
 
-    if (password !== confirmPassword) {
-      res.status(400).json({
-        success: false,
-        message: "Passwords do not match",
-      });
-      return;
-    }
+    // if (password !== confirmPassword) {
+    //   console.log('Password mismatch:', { password, confirmPassword });
+    //   res.status(400).json({
+    //     success: false,
+    //     message: "Passwords do not match",
+    //   });
+    //   return;
+    // }
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({

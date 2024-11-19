@@ -9,22 +9,23 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const app_1 = require("../app");
 const signup = async (req, res, next) => {
     try {
-        const { firstName, lastName, email, password, confirmPassword, contactNumber, accountType, } = req.body;
+        const { firstName, lastName, email, password, contactNumber, accountType, } = req.body;
         // Validation
-        if (!firstName || !lastName || !email || !password || !confirmPassword || !contactNumber) {
+        if (!firstName || !lastName || !email || !password || !contactNumber) {
             res.status(400).json({
                 success: false,
                 message: "Please fill all required fields",
             });
             return;
         }
-        if (password !== confirmPassword) {
-            res.status(400).json({
-                success: false,
-                message: "Passwords do not match",
-            });
-            return;
-        }
+        // if (password !== confirmPassword) {
+        //   console.log('Password mismatch:', { password, confirmPassword });
+        //   res.status(400).json({
+        //     success: false,
+        //     message: "Passwords do not match",
+        //   });
+        //   return;
+        // }
         // Check if user exists
         const existingUser = await app_1.prisma.user.findUnique({
             where: { email },

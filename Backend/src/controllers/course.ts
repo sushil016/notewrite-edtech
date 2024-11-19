@@ -90,7 +90,16 @@ export const getTeacherCourses = async (req: AuthRequest, res: Response): Promis
             include: {
                 sections: {
                     include: {
-                        subSections: true
+                        subSections: {
+                            select: {
+                                id: true,
+                                title: true,
+                                description: true,
+                                videoUrl: true,
+                                notesUrls: true,
+                                timeDuration: true
+                            }
+                        }
                     }
                 },
                 category: true,
@@ -464,7 +473,16 @@ export const getEnrolledCourses = async (req: AuthRequest, res: Response): Promi
             category: true,
             sections: {
               include: {
-                subSections: true
+                subSections: {
+                  select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    videoUrl: true,
+                    notesUrls: true,
+                    timeDuration: true
+                  }
+                }
               }
             }
           }

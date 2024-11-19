@@ -6,7 +6,7 @@ import React from 'react'
 const Courses = () => {
   return (
     <div className='flex flex-col gap-10 pt-20'>
-      <TopCoursesSection />
+      <TopCoursesSection courses={[]} />
       <ListedCoursesSection />
     </div>
   )

@@ -1,34 +1,20 @@
 "use client";
 import React, { useState } from "react";
-import { IconBrandGoogle } from "@tabler/icons-react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { LabelInputContainer } from "./inputContainer/InputConatiner";
 import { BottomGradient } from "./effects/BotttomGradient";
 import Heading from "./headersComponent/Heading";
 import SubHeading from "./headersComponent/SubHeading";
-import { signIn } from "next-auth/react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
-
-interface SignupFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  contactNumber: string;
-  accountType: 'STUDENT' | 'TEACHER' | 'ADMIN';
-  otp?: string;
-}
+import axiosInstance from '@/lib/axios';
 
 export function Signup() {
-  const [formData, setFormData] = useState<SignupFormData>({
+  const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
     contactNumber: "",
     accountType: "STUDENT", // default value
   });
@@ -44,58 +30,6 @@ export function Signup() {
     });
   };
 
-  const handleGoogleSignIn = () => {
-    signIn("google");
-  };
-
-  const sendOTP = async (email: string) => {
-    try {
-      const response = await axios.post('http://localhost:8000/api/v1/auth/send-otp', {
-        email
-      });
-      return response.data.success;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to send OTP");
-    }
-  };
-
-  const handleVerificationSuccess = async (verifiedData: SignupFormData) => {
-    try {
-      const response = await axios.post(
-        'http://localhost:8000/api/v1/auth/signup',
-        verifiedData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.data.success) {
-        // Store user data
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        
-        // Redirect based on account type
-        switch (verifiedData.accountType) {
-          case 'ADMIN':
-            router.push('/admin/dashboard');
-            break;
-          case 'TEACHER':
-            router.push('/teacher/dashboard');
-            break;
-          case 'STUDENT':
-            router.push('/'); // Students go to home page
-            break;
-          default:
-            router.push('/');
-        }
-      }
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Signup failed");
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -104,25 +38,39 @@ export function Signup() {
     try {
       // Validation
       if (!formData.firstName || !formData.lastName || !formData.email || 
-          !formData.password || !formData.confirmPassword || !formData.contactNumber) {
+          !formData.password || !formData.contactNumber) {
         throw new Error("Please fill all required fields");
       }
 
-      if (formData.password !== formData.confirmPassword) {
-        throw new Error("Passwords don't match!");
-      }
-
-      // First send OTP
-      const otpSent = await sendOTP(formData.email);
+      // Send OTP
+      const response = await axiosInstance.post('/auth/send-otp', {
+        email: formData.email
+      });
       
-      if (otpSent) {
-        // Store email in session storage for OTP verification
-        sessionStorage.setItem('signupData', JSON.stringify(formData));
+      if (response.data.success) {
+        // Store complete signup data in session storage
+        const dataToStore = {
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim().toLowerCase(),
+          password: formData.password, // Only use password
+          contactNumber: formData.contactNumber.trim(),
+          accountType: formData.accountType,
+        };
+
+        console.log('Data being stored:', {
+          ...dataToStore,
+          password: '***'
+        });
+
+        sessionStorage.setItem('signupData', JSON.stringify(dataToStore));
+        sessionStorage.setItem('otpTimestamp', Date.now().toString());
         router.push('/verify-otp');
       }
 
     } catch (error: any) {
-      setError(error.message || "Something went wrong!");
+      console.error('Signup error:', error);
+      setError(error.response?.data?.message || error.friendlyMessage || error.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -215,19 +163,6 @@ export function Signup() {
           />
         </LabelInputContainer>
 
-        <LabelInputContainer className="mb-8">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            placeholder="••••••••"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            required
-          />
-        </LabelInputContainer>
-
         {error && (
           <div className="text-red-500 text-sm mb-4">
             {error}
@@ -246,20 +181,6 @@ export function Signup() {
         </button>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-        <div className="">
-          <button
-            onClick={handleGoogleSignIn}
-            type="button"
-            className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-          >
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-              Google
-            </span>
-            <BottomGradient />
-          </button>
-        </div>
       </form>
     </div>
   );

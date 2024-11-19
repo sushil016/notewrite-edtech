@@ -68,7 +68,16 @@ const getTeacherCourses = async (req, res) => {
             include: {
                 sections: {
                     include: {
-                        subSections: true
+                        subSections: {
+                            select: {
+                                id: true,
+                                title: true,
+                                description: true,
+                                videoUrl: true,
+                                notesUrls: true,
+                                timeDuration: true
+                            }
+                        }
                     }
                 },
                 category: true,
@@ -392,7 +401,16 @@ const getEnrolledCourses = async (req, res) => {
                         category: true,
                         sections: {
                             include: {
-                                subSections: true
+                                subSections: {
+                                    select: {
+                                        id: true,
+                                        title: true,
+                                        description: true,
+                                        videoUrl: true,
+                                        notesUrls: true,
+                                        timeDuration: true
+                                    }
+                                }
                             }
                         }
                     }

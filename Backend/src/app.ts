@@ -28,6 +28,16 @@ app.use(cors({
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`, {
+    query: req.query,
+    params: req.params,
+    body: req.method === 'POST' ? req.body : undefined
+  });
+  next();
+});
+
 // Health check route
 app.get('/health', (req, res) => {
   res.status(200).json({

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   motion,
   useAnimationFrame,
@@ -7,157 +7,138 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { useRef } from "react";
-import { cn } from "../utils/cn";
+import { cn } from "@/lib/utils";
 
-export function MovingButton({
-  borderRadius = "1rem",
+export function MovingBorder({
   children,
-  as: Component = "button",
+  duration = 2000,
+  roundedCorners = "rounded-lg",
+  className,
   containerClassName,
   borderClassName,
-  duration,
-  className,
+  as: Component = "button",
   ...otherProps
 }: {
-  borderRadius?: string;
   children: React.ReactNode;
-  as?: any;
+  duration?: number;
+  roundedCorners?: string;
+  className?: string;
   containerClassName?: string;
   borderClassName?: string;
-  duration?: number;
-  className?: string;
+  as?: any;
   [key: string]: any;
 }) {
+  const pathRef = useRef<SVGPathElement>(null);
+  const [pathLength, setPathLength] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (pathRef.current && isMounted) {
+      try {
+        setPathLength(pathRef.current.getTotalLength());
+      } catch (error) {
+        console.warn("Path length calculation failed:", error);
+      }
+    }
+  }, [isMounted]);
+
+  const progress = useMotionValue(0);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  useAnimationFrame((time) => {
+    if (!isMounted || !pathRef.current) return;
+    try {
+      const dt = (time / duration) % 1;
+      progress.set(dt);
+      const point = pathRef.current.getPointAtLength(dt * pathLength);
+      x.set(point.x);
+      y.set(point.y);
+    } catch (error) {
+      console.warn("Animation frame calculation failed:", error);
+    }
+  });
+
+  const transform = useTransform(
+    progress,
+    [0, 1],
+    ["none", "translateX(100%)"]
+  );
+
   return (
     <Component
       className={cn(
-        "bg-transparent relative text-xl h-10 w-40 p-[1px] overflow-hidden",
+        "relative text-center h-10 border border-slate-800 dark:border-slate-800 bg-slate-900 p-[1px] overflow-hidden",
+        roundedCorners,
         containerClassName
       )}
-      style={{
-        borderRadius: borderRadius,
-      }}
       {...otherProps}
     >
       <div
-        className="absolute inset-0"
-        style={{ borderRadius: `calc(${borderRadius} * 0.96)` }}
-      >
-        <MovingBorder duration={duration} rx="30%" ry="30%">
-          <div
-            className={cn(
-              "h-20 w-20 opacity-[0.8] bg-[radial-gradient(var(--sky-500)_40%,transparent_60%)]",
-              borderClassName
-            )}
-          />
-        </MovingBorder>
-      </div>
-
-      <div
         className={cn(
-          "relative bg-slate-900/[0.8] border border-slate-800 backdrop-blur-xl text-white flex items-center justify-center w-full h-full text-sm antialiased",
+          "relative h-full w-full bg-slate-900",
+          roundedCorners,
           className
         )}
-        style={{
-          borderRadius: `calc(${borderRadius} * 0.96)`,
-        }}
       >
         {children}
       </div>
-    </Component>
-  );
-}
 
-export const MovingBorder = ({
-  children,
-  duration = 2000,
-  rx,
-  ry,
-  ...otherProps
-}: {
-  children: React.ReactNode;
-  duration?: number;
-  rx?: string;
-  ry?: string;
-  [key: string]: any;
-}) => {
-  const pathRef = useRef<SVGRectElement | null>(null);
-  const progress = useMotionValue<number>(0);
-  const [isPathReady, setIsPathReady] = React.useState(false);
-
-  useEffect(() => {
-    if (pathRef.current) {
-      setIsPathReady(true);
-    }
-  }, []);
-
-  useAnimationFrame((time) => {
-    if (!pathRef.current || !isPathReady) return;
-    
-    try {
-      const length = pathRef.current.getTotalLength();
-      if (length) {
-        const pxPerMillisecond = length / duration;
-        progress.set((time * pxPerMillisecond) % length);
-      }
-    } catch (error) {
-      console.warn("Path calculation error:", error);
-    }
-  });
-
-  const x = useTransform(progress, (val) => {
-    if (!pathRef.current || !isPathReady) return 0;
-    try {
-      return pathRef.current.getPointAtLength(val)?.x || 0;
-    } catch (error) {
-      return 0;
-    }
-  });
-
-  const y = useTransform(progress, (val) => {
-    if (!pathRef.current || !isPathReady) return 0;
-    try {
-      return pathRef.current.getPointAtLength(val)?.y || 0;
-    } catch (error) {
-      return 0;
-    }
-  });
-
-  const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;
-
-  return (
-    <>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-        className="absolute h-full w-full"
-        width="100%"
-        height="100%"
-        {...otherProps}
-      >
-        <rect
-          fill="none"
-          width="100%"
-          height="100%"
-          rx={rx}
-          ry={ry}
-          ref={pathRef}
-          pathLength="1"
-          stroke="transparent"
-        />
-      </svg>
       <motion.div
+        style={{
+          transform,
+        }}
+        className={cn(
+          "absolute inset-0 border border-transparent [background:linear-gradient(var(--gradient)_,var(--gradient))_padding-box,linear-gradient(to_right,#334454,#334454)_border-box] pointer-events-none",
+          roundedCorners,
+          borderClassName
+        )}
+      />
+
+      <svg
         style={{
           position: "absolute",
           top: 0,
           left: 0,
-          display: "inline-block",
-          transform,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          opacity: 0,
         }}
       >
-        {children}
-      </motion.div>
-    </>
+        <path
+          ref={pathRef}
+          d={`M 0 30 A 30 30 0 0 1 30 0 L ${pathLength - 30} 0 A 30 30 0 0 1 ${pathLength} 30 L ${pathLength} ${pathLength - 30} A 30 30 0 0 1 ${pathLength - 30} ${pathLength} L 30 ${pathLength} A 30 30 0 0 1 0 ${pathLength - 30} Z`}
+          fill="none"
+        />
+      </svg>
+    </Component>
   );
-};
+}
+
+export function MovingButton({
+  children,
+  className,
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+  [key: string]: any;
+}) {
+  return (
+    <MovingBorder
+      containerClassName={cn(
+        "bg-slate-900/[0.8] border-slate-800/[0.8] dark:border-slate-600/[0.8]",
+        className
+      )}
+      className="text-white relative overflow-hidden px-4 py-2 transition-colors hover:text-white/80"
+      {...props}
+    >
+      <span className="relative z-10">{children}</span>
+    </MovingBorder>
+  );
+}
