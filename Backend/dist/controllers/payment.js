@@ -87,59 +87,62 @@ const capturePayment = async (req, res) => {
 exports.capturePayment = capturePayment;
 const verifyPayment = async (req, res) => {
     try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, notes } = req.body;
-        const { courseId, userId } = notes;
-        const sign = razorpay_order_id + "|" + razorpay_payment_id;
-        const expectedSign = crypto_1.default
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, courseId } = req.body;
+        // Get the order details from Razorpay
+        const order = await razorpay.orders.fetch(razorpay_order_id);
+        // Verify signature
+        const body = razorpay_order_id + "|" + razorpay_payment_id;
+        const expectedSignature = crypto_1.default
             .createHmac("sha256", process.env.RAZORPAY_SECRET)
-            .update(sign)
+            .update(body.toString())
             .digest("hex");
-        if (razorpay_signature !== expectedSign) {
+        if (expectedSignature !== razorpay_signature) {
             res.status(400).json({
                 success: false,
-                message: "Invalid payment signature"
+                message: "Invalid signature"
             });
             return;
         }
-        const [course, user] = await Promise.all([
-            app_1.prisma.course.findUnique({ where: { id: courseId } }),
-            app_1.prisma.user.findUnique({ where: { id: userId } })
-        ]);
-        if (!course || !user) {
-            res.status(404).json({
-                success: false,
-                message: "Course or user not found"
-            });
-            return;
-        }
+        // Enroll student in the course
         await app_1.prisma.course.update({
             where: { id: courseId },
             data: {
                 students: {
-                    connect: { id: userId }
+                    connect: { id: req.user.id }
                 }
             }
         });
+        // Create course progress entry
         await app_1.prisma.courseProgress.create({
             data: {
-                userId,
-                courseId
+                userId: req.user.id,
+                courseId: courseId,
             }
         });
-        if (user.email) {
+        // Send enrollment confirmation email
+        const user = await app_1.prisma.user.findUnique({
+            where: { id: req.user.id },
+            include: {
+                profile: true
+            }
+        });
+        const course = await app_1.prisma.course.findUnique({
+            where: { id: courseId }
+        });
+        if (user && course) {
             await (0, mailSender_1.sendMail)({
                 email: user.email,
-                subject: "Course Enrollment Confirmation",
-                html: (0, emailTemplates_1.courseEnrollmentTemplate)(course.courseName, `${user.firstName} ${user.lastName}`)
+                subject: "Course Enrollment Successful",
+                text: (0, emailTemplates_1.courseEnrollmentTemplate)(user.firstName, course.courseName)
             });
         }
         res.status(200).json({
             success: true,
-            message: "Payment verified and course enrollment completed"
+            message: "Payment verified and enrollment successful"
         });
     }
     catch (error) {
-        console.error(error);
+        console.error('Error in verifyPayment:', error);
         res.status(500).json({
             success: false,
             message: "Error verifying payment"

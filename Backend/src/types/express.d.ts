@@ -22,6 +22,11 @@ export interface AuthRequest extends Request {
     lastName: string;
     accountType: AccountType;
   };
+  params: {
+    courseId?: string;
+    [key: string]: string | undefined;
+  };
+  body: any;
 }
 
 export {}; 
