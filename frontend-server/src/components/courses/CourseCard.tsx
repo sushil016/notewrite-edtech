@@ -6,25 +6,23 @@ import { toast } from 'sonner';
 
 interface CourseCardProps {
   course: Course;
-  onEnroll?: (courseId: string, price: number) => Promise<void>;
+  onPreview?: (courseId: string) => void;
 }
 
-export const CourseCard: FC<CourseCardProps> = ({ course, onEnroll }) => {
+export const CourseCard: FC<CourseCardProps> = ({ course, onPreview }) => {
   const { user } = useAuth();
 
-  const handleEnrollClick = async () => {
-    if (!user) {
-      toast.error('Please login to enroll in courses');
-      return;
-    }
-
-    if (onEnroll) {
-      await onEnroll(course.id, course.price);
+  const handleClick = () => {
+    if (onPreview) {
+      onPreview(course.id);
     }
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 shadow-xl">
+    <div 
+      className="bg-white/10 backdrop-blur-lg rounded-lg p-6 shadow-xl cursor-pointer hover:shadow-2xl transition-all"
+      onClick={handleClick}
+    >
       <h3 className="text-xl font-semibold text-white mb-2">{course.courseName}</h3>
       <p className="text-gray-300 mb-4 line-clamp-2">{course.courseDescription}</p>
       
@@ -42,15 +40,6 @@ export const CourseCard: FC<CourseCardProps> = ({ course, onEnroll }) => {
           {course.price > 0 ? `₹${course.price}` : 'Free'}
         </span>
       </div>
-
-      {onEnroll && (
-        <MovingButton
-          onClick={handleEnrollClick}
-          className="w-full"
-        >
-          {course.price > 0 ? `Enroll for ₹${course.price}` : 'Enroll Free'}
-        </MovingButton>
-      )}
     </div>
   );
 };

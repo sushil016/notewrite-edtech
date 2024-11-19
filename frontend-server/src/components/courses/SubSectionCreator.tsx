@@ -9,12 +9,14 @@ import TextArea from '@/components/ui/textArea';
 import { toast } from 'sonner';
 import axiosInstance from '@/lib/axios';
 import { useRouter } from 'next/navigation';
+import { FaFileUpload } from 'react-icons/fa';
 
 const subSectionSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   timeDuration: z.string().min(1, 'Duration is required'),
-  video: z.any().refine((file) => file?.length === 1, 'Video file is required')
+  video: z.any().refine((file) => file?.length === 1, 'Video file is required'),
+  notes: z.any().optional()
 });
 
 type SubSectionFormData = z.infer<typeof subSectionSchema>;
@@ -65,6 +67,10 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
       formData.append('timeDuration', data.timeDuration);
       formData.append('sectionId', selectedSection);
       formData.append('video', data.video[0]);
+      
+      if (data.notes?.[0]) {
+        formData.append('notes', data.notes[0]);
+      }
 
       const response = await axiosInstance.post('/api/v1/subsections/create', formData, {
         headers: {
@@ -166,6 +172,24 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
           {errors.video && (
             <p className="text-red-500 text-sm mt-1">{errors.video.message?.toString()}</p>
           )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Lecture Notes (PDF) <span className="text-gray-400 text-xs">Optional</span>
+          </label>
+          <div className="flex items-center gap-2">
+            <Input
+              type="file"
+              accept=".pdf"
+              {...register('notes')}
+              className="flex-1"
+            />
+            <FaFileUpload className="text-gray-400" />
+          </div>
+          <p className="text-xs text-gray-400 mt-1">
+            Upload lecture notes in PDF format (max 10MB)
+          </p>
         </div>
 
         <div className="flex justify-between">

@@ -13,7 +13,10 @@ interface CreateSubSectionRequest {
 
 type SubSectionAuthRequest = AuthRequest & { 
     body: CreateSubSectionRequest;
-    file?: Express.Multer.File;
+    files?: {
+        video?: Express.Multer.File[];
+        notes?: Express.Multer.File[];
+    };
 };
 
 export const createSubSection = async (req: SubSectionAuthRequest, res: Response): Promise<void> => {
@@ -21,7 +24,7 @@ export const createSubSection = async (req: SubSectionAuthRequest, res: Response
         const { title, description, timeDuration, sectionId } = req.body;
         const teacherId = req.user.id;
 
-        if (!title || !description || !timeDuration || !sectionId || !req.file) {
+        if (!title || !description || !timeDuration || !sectionId || !req.files?.video) {
             res.status(400).json({
                 success: false,
                 message: "Missing required fields"
@@ -48,9 +51,12 @@ export const createSubSection = async (req: SubSectionAuthRequest, res: Response
         }
 
         // Upload video to cloudinary
-        const uploadResponse = await uploadToCloudinary(req.file.path, 'course-videos');
+        const videoResult = await uploadToCloudinary(
+            req.files.video[0].path,
+            'course-videos'
+        );
 
-        if (!uploadResponse || !uploadResponse.secure_url) {
+        if (!videoResult) {
             res.status(500).json({
                 success: false,
                 message: "Error uploading video"
@@ -58,12 +64,25 @@ export const createSubSection = async (req: SubSectionAuthRequest, res: Response
             return;
         }
 
+        // Upload PDF if present and initialize notesUrls array
+        let notesUrls: string[] = [];
+        if (req.files.notes?.[0]) {
+            const notesResult = await uploadToCloudinary(
+                req.files.notes[0].path,
+                'course-notes'
+            );
+            if (notesResult) {
+                notesUrls.push(notesResult.secure_url);
+            }
+        }
+
         const subSection = await prisma.subSection.create({
             data: {
                 title,
                 description,
                 timeDuration,
-                videoUrl: uploadResponse.secure_url,
+                videoUrl: videoResult.secure_url,
+                notesUrls: notesUrls || [],
                 section: {
                     connect: { id: sectionId }
                 }
@@ -97,12 +116,13 @@ type UpdateSubSectionAuthRequest = AuthRequest & {
     file?: Express.Multer.File;
 };
 
-export const updateSubSection = async (req: UpdateSubSectionAuthRequest, res: Response): Promise<void> => {
+export const updateSubSection = async (req: SubSectionAuthRequest, res: Response): Promise<void> => {
     try {
-        const { title, description, timeDuration, subSectionId } = req.body;
+        const { title, description, timeDuration } = req.body;
+        const { subSectionId } = req.params;
         const teacherId = req.user.id;
 
-        // Verify the subsection belongs to a course owned by the teacher
+        // Verify ownership
         const subSection = await prisma.subSection.findFirst({
             where: {
                 id: subSectionId,
@@ -122,26 +142,38 @@ export const updateSubSection = async (req: UpdateSubSectionAuthRequest, res: Re
             return;
         }
 
-        let videoUrl: string | undefined;
-        if (req.file) {
-            const uploadResponse = await uploadToCloudinary(req.file.path, 'course-videos');
-            if (!uploadResponse || !uploadResponse.secure_url) {
-                res.status(500).json({
-                    success: false,
-                    message: "Error uploading video"
-                });
-                return;
+        let videoUrl = subSection.videoUrl;
+        if (req.files?.video?.[0]) {
+            const videoResult = await uploadToCloudinary(
+                req.files.video[0].path,
+                'course-videos'
+            );
+            if (videoResult) {
+                videoUrl = videoResult.secure_url;
             }
-            videoUrl = uploadResponse.secure_url;
+        }
+
+        // Handle multiple PDF uploads
+        let notesUrls = subSection.notesUrls || [];
+        if (req.files?.notes) {
+            const notePromises = req.files.notes.map(note => 
+                uploadToCloudinary(note.path, 'course-notes')
+            );
+            const noteResults = await Promise.all(notePromises);
+            const newNoteUrls = noteResults
+                .filter(result => result !== null)
+                .map(result => result!.secure_url);
+            notesUrls = [...notesUrls, ...newNoteUrls];
         }
 
         const updatedSubSection = await prisma.subSection.update({
             where: { id: subSectionId },
             data: {
-                ...(title && { title }),
-                ...(description && { description }),
-                ...(timeDuration && { timeDuration }),
-                ...(videoUrl && { videoUrl })
+                title,
+                description,
+                timeDuration,
+                videoUrl,
+                notesUrls
             }
         });
 
@@ -201,6 +233,54 @@ export const deleteSubSection = async (req: DeleteSubSectionAuthRequest, res: Re
         res.status(500).json({
             success: false,
             message: "Error deleting subsection"
+        });
+    }
+};
+
+export const deleteNote = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const { subSectionId } = req.params;
+        const { noteUrl } = req.body;
+        const teacherId = req.user.id;
+
+        const subSection = await prisma.subSection.findFirst({
+            where: {
+                id: subSectionId,
+                section: {
+                    course: {
+                        teacherId
+                    }
+                }
+            }
+        });
+
+        if (!subSection) {
+            res.status(404).json({
+                success: false,
+                message: "Subsection not found or you don't have permission"
+            });
+            return;
+        }
+
+        const updatedNotes = subSection.notesUrls.filter(url => url !== noteUrl);
+
+        await prisma.subSection.update({
+            where: { id: subSectionId },
+            data: {
+                notesUrls: updatedNotes
+            }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Note deleted successfully"
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Error deleting note"
         });
     }
 }; 

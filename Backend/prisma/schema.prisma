@@ -92,16 +92,17 @@ model Section {
 }
 
 model SubSection {
-  id           String       @id @default(uuid())
-  title        String
-  description  String?
-  timeDuration String?
-  videoUrl     String?
-  
-  // Relations
-  section      Section      @relation(fields: [sectionId], references: [id])
-  sectionId    String
-  completedBy  CourseProgress[] @relation("CompletedVideos")
+  id            String   @id @default(uuid())
+  title         String
+  description   String
+  videoUrl      String
+  notesUrls     String[] @default([])
+  timeDuration  String
+  section       Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  sectionId     String
+  completedBy   CourseProgress[] @relation("CompletedVideos")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("sub_sections")
 }

@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { MovingButton } from '../ui/moving-border';
 import { RazorpayScript } from '../payment/RazorpayScript';
+import { useRouter } from 'next/navigation';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,6 +25,7 @@ export const ListedCoursesSection = () => {
   const [hasMore, setHasMore] = useState(true);
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -120,6 +122,10 @@ export const ListedCoursesSection = () => {
     }
   };
 
+  const handlePreview = (courseId: string) => {
+    router.push(`/courses/${courseId}/preview`);
+  };
+
   const filteredCourses = courses.filter(course => 
     (selectedCategory === "All" || course.category?.name === selectedCategory) &&
     course.courseName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -166,7 +172,7 @@ export const ListedCoursesSection = () => {
                 <div key={course.id} className="course-card">
                   <CourseCard 
                     course={course}
-                    onEnroll={handleEnroll}
+                    onPreview={handlePreview}
                   />
                 </div>
               ))}

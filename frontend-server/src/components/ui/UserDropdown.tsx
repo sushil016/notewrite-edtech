@@ -99,10 +99,10 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ user }) => {
               <FaUser className="mr-3" /> Profile
             </Link>
             <Link
-              href="/my-courses"
+              href="/dashboard/my-courses"
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              <FaBook className="mr-3" /> My Courses
+              <FaBook className="mr-3" /> My Learning
             </Link>
             <Link
               href="/settings"

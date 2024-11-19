@@ -23,19 +23,35 @@ const storage = multer.diskStorage({
     }
 });
 
+const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    if (file.fieldname === 'video' && file.mimetype.startsWith('video/')) {
+        cb(null, true);
+    } else if (file.fieldname === 'notes' && file.mimetype === 'application/pdf') {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type'));
+    }
+};
+
+const limits = {
+    fileSize: (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+        if (file.fieldname === 'video') {
+            return 100 * 1024 * 1024; // 100MB for video
+        }
+        return 10 * 1024 * 1024; // 10MB for PDF
+    }
+};
+
 const upload = multer({ 
     storage,
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('video/')) {
-            cb(null, true);
-        } else {
-            cb(new Error('Not a video file'));
-        }
-    },
+    fileFilter,
     limits: {
-        fileSize: 100 * 1024 * 1024 // 100MB limit
+        fileSize: 100 * 1024 * 1024 // Default to 100MB, will be overridden by dynamic limit
     }
-}).single('video');
+}).fields([
+    { name: 'video', maxCount: 1 },
+    { name: 'notes', maxCount: 1 }
+]);
 
 // Type-safe wrapper for async handlers with AuthRequest
 const asyncHandler = <T extends AuthRequest>(

@@ -5,8 +5,9 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { MovingButton } from '@/components/ui/moving-border';
 import axiosInstance from '@/lib/axios';
 import { toast } from 'sonner';
-import { FaVideo, FaChevronDown, FaChevronUp, FaPlay, FaExpand, FaCompress } from 'react-icons/fa';
+import { FaVideo, FaChevronDown, FaChevronUp, FaPlay, FaExpand, FaCompress, FaEdit, FaFilePdf } from 'react-icons/fa';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { UpdateSubSection } from '@/components/courses/UpdateSubSection';
 
 interface SubSection {
   id: string;
@@ -14,6 +15,7 @@ interface SubSection {
   description: string;
   videoUrl: string;
   timeDuration: string;
+  notesUrls: string[];
 }
 
 interface Section {
@@ -143,15 +145,13 @@ export default function CourseReview({ params }: { params: { courseId: string } 
   const [loading, setLoading] = useState(true);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; title: string } | null>(null);
+  const [selectedSubSection, setSelectedSubSection] = useState<SubSection | null>(null);
+  const [selectedPdf, setSelectedPdf] = useState<{ url: string; title: string } | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchCourseDetails();
-  }, [params.courseId]);
-
-  const fetchCourseDetails = async () => {
+  const fetchCourseDetails = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/courses/${params.courseId}`);
+      const response = await axiosInstance.get(`/api/v1/courses/${params.courseId}/preview`);
       setCourse(response.data.data);
     } catch (error) {
       toast.error('Error fetching course details');
@@ -159,7 +159,13 @@ export default function CourseReview({ params }: { params: { courseId: string } 
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.courseId]);
+
+  useEffect(() => {
+    if (params.courseId) {
+      fetchCourseDetails();
+    }
+  }, [params.courseId, fetchCourseDetails]);
 
   const toggleSection = (sectionId: string) => {
     const newExpanded = new Set(expandedSections);
@@ -267,14 +273,45 @@ export default function CourseReview({ params }: { params: { courseId: string } 
                               <h3 className="text-white font-medium">{subSection.title}</h3>
                               <p className="text-sm text-gray-400">{subSection.description}</p>
                               <span className="text-xs text-gray-500">Duration: {subSection.timeDuration} minutes</span>
+                              {subSection.notesUrls && subSection.notesUrls.length > 0 && (
+                                <div className="mt-2 flex gap-2">
+                                  {subSection.notesUrls.map((noteUrl, index) => (
+                                    <button
+                                      key={index}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedPdf({
+                                          url: noteUrl,
+                                          title: `${subSection.title} - Note ${index + 1}`
+                                        });
+                                      }}
+                                      className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 bg-blue-500/10 px-2 py-1 rounded"
+                                    >
+                                      <FaFilePdf />
+                                      <span>Note {index + 1}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleVideoClick(subSection.videoUrl, subSection.title)}
-                            className="p-2 rounded-full bg-blue-500/10 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <FaPlay />
-                          </button>
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSubSection(subSection);
+                              }}
+                              className="p-2 rounded-full bg-blue-500/10 text-blue-400"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleVideoClick(subSection.videoUrl, subSection.title)}
+                              className="p-2 rounded-full bg-blue-500/10 text-blue-400"
+                            >
+                              <FaPlay />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -303,12 +340,38 @@ export default function CourseReview({ params }: { params: { courseId: string } 
         </div>
       </div>
 
-      <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
+      <Dialog open={!!selectedVideo || !!selectedPdf} onOpenChange={() => {
+        setSelectedVideo(null);
+        setSelectedPdf(null);
+      }}>
         <DialogContent className="sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] bg-gray-900 border-gray-800">
           {selectedVideo && (
             <VideoPlayer 
               videoUrl={selectedVideo.url} 
               title={selectedVideo.title} 
+            />
+          )}
+          {selectedPdf && (
+            <div className="h-[80vh]">
+              <h3 className="text-lg font-semibold mb-4 text-white">{selectedPdf.title}</h3>
+              <iframe
+                src={`${selectedPdf.url}#toolbar=0`}
+                className="w-full h-full rounded-lg"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!selectedSubSection} onOpenChange={() => setSelectedSubSection(null)}>
+        <DialogContent className="sm:max-w-[600px] bg-gray-900 border-gray-800">
+          {selectedSubSection && (
+            <UpdateSubSection 
+              subSection={selectedSubSection}
+              onComplete={() => {
+                setSelectedSubSection(null);
+                fetchCourseDetails();
+              }}
             />
           )}
         </DialogContent>

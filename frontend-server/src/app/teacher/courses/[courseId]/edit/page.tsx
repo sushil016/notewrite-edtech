@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,22 +46,7 @@ export default function EditCourse({ params }: { params: { courseId: string } })
     resolver: zodResolver(courseSchema)
   });
 
-  useEffect(() => {
-    fetchCourseDetails();
-    fetchCategories();
-  }, [params.courseId]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axiosInstance.get('/api/v1/categories/all');
-      setCategories(response.data.data);
-    } catch (error) {
-      toast.error('Error fetching categories');
-      console.error(error);
-    }
-  };
-
-  const fetchCourseDetails = async () => {
+  const fetchCourseDetails = useCallback(async () => {
     try {
       const response = await axiosInstance.get(`/api/v1/courses/${params.courseId}`);
       const courseData = response.data.data;
@@ -84,7 +69,22 @@ export default function EditCourse({ params }: { params: { courseId: string } })
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.courseId, reset]);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await axiosInstance.get('/api/v1/categories/all');
+      setCategories(response.data.data);
+    } catch (error) {
+      toast.error('Error fetching categories');
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCourseDetails();
+    fetchCategories();
+  }, [fetchCourseDetails, fetchCategories]);
 
   const handleAddTag = () => {
     if (newTag.trim()) {
@@ -127,6 +127,14 @@ export default function EditCourse({ params }: { params: { courseId: string } })
       console.error(error);
     }
   };
+
+  const skipToSubsections = useCallback(() => {
+    setCurrentStep(3);
+  }, []);
+
+  const skipToReview = useCallback(() => {
+    router.push(`/teacher/courses/${params.courseId}/review`);
+  }, [router, params.courseId]);
 
   if (loading) {
     return (
@@ -279,26 +287,53 @@ export default function EditCourse({ params }: { params: { courseId: string } })
                     )}
                   </div>
 
-                  <div className="pt-6">
-                    <MovingButton type="submit" className="w-full">
+                  <div className="flex justify-between pt-6">
+                    <MovingButton type="submit">
                       Update Course Details
+                    </MovingButton>
+                    <MovingButton 
+                      type="button"
+                      onClick={skipToSubsections}
+                      variant="outline"
+                    >
+                      Skip to Content
                     </MovingButton>
                   </div>
                 </form>
               )}
 
               {currentStep === 2 && (
-                <SectionCreator 
-                  courseId={params.courseId} 
-                  onComplete={() => setCurrentStep(3)} 
-                />
+                <div>
+                  <SectionCreator 
+                    courseId={params.courseId} 
+                    onComplete={() => setCurrentStep(3)} 
+                  />
+                  <div className="flex justify-end mt-4">
+                    <MovingButton 
+                      onClick={skipToSubsections}
+                      variant="outline"
+                    >
+                      Skip to Content
+                    </MovingButton>
+                  </div>
+                </div>
               )}
 
               {currentStep === 3 && (
-                <SubSectionCreator 
-                  courseId={params.courseId} 
-                  onComplete={() => router.push(`/teacher/courses/${params.courseId}/review`)} 
-                />
+                <div>
+                  <SubSectionCreator 
+                    courseId={params.courseId} 
+                    onComplete={skipToReview} 
+                  />
+                  <div className="flex justify-end mt-4">
+                    <MovingButton 
+                      onClick={skipToReview}
+                      variant="outline"
+                    >
+                      Skip to Review
+                    </MovingButton>
+                  </div>
+                </div>
               )}
             </div>
           </div>
