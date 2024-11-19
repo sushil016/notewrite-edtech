@@ -15,6 +15,8 @@ const category_1 = __importDefault(require("./routes/category"));
 const course_1 = __importDefault(require("./routes/course"));
 const payment_1 = __importDefault(require("./routes/payment"));
 const section_1 = __importDefault(require("./routes/section"));
+const subsection_1 = __importDefault(require("./routes/subsection"));
+const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 exports.prisma = new client_1.PrismaClient();
 // Middleware
@@ -27,6 +29,7 @@ app.use((0, cors_1.default)({
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
     exposedHeaders: ['set-cookie'],
 }));
+app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
 // Health check route
 app.get('/health', (req, res) => {
     res.status(200).json({
@@ -42,6 +45,7 @@ app.use('/api/v1/categories', category_1.default);
 app.use('/api/v1/courses', course_1.default);
 app.use('/api/v1/payments', payment_1.default);
 app.use('/api/v1/sections', section_1.default);
+app.use('/api/v1/subsections', subsection_1.default);
 // Add a test route to check token
 app.get('/api/test-auth', (req, res) => {
     console.log('Cookies received:', req.cookies);

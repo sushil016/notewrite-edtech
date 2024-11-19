@@ -57,6 +57,7 @@ model Course {
   courseName       String
   courseDescription String?
   whatYouWillLearn String?
+  price           Float         @default(0)
   status          CourseStatus  @default(DRAFT)
   tag             String[]
   instructions    String[]

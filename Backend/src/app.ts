@@ -9,6 +9,8 @@ import categoryRoutes from './routes/category';
 import courseRoutes from './routes/course';
 import paymentRoutes from './routes/payment';
 import sectionRoutes from './routes/section';
+import subsectionRoutes from './routes/subsection';
+import path from 'path';
 
 const app: Express = express();
 export const prisma = new PrismaClient();
@@ -23,6 +25,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   exposedHeaders: ['set-cookie'],
 }));
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check route
 app.get('/health', (req, res) => {
@@ -40,7 +44,7 @@ app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/sections', sectionRoutes);
-
+app.use('/api/v1/subsections', subsectionRoutes);
 // Add a test route to check token
 app.get('/api/test-auth', (req, res) => {
   console.log('Cookies received:', req.cookies);

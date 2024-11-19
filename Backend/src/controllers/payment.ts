@@ -65,61 +65,59 @@ export const capturePayment = async (req: CapturePaymentRequest, res: Response):
         const { courseId } = req.body;
         const userId = req.user.id;
 
-        if (!userId) {
-            res.status(401).json({
-                success: false,
-                message: "Authentication required"
-            });
-            return;
-        }
-
-        if (!courseId) {
-            res.status(400).json({
-                success: false,
-                message: "Course ID is required"
-            });
-            return;
-        }
-
-        const course = await prisma.course.findFirst({
-            where: {
-                id: courseId,
-                students: {
-                    none: {
-                        id: userId
-                    }
-                }
+        // Get course details including price
+        const course = await prisma.course.findUnique({
+            where: { id: courseId },
+            select: {
+                id: true,
+                courseName: true,
+                price: true,
+                teacherId: true
             }
         });
 
         if (!course) {
             res.status(404).json({
                 success: false,
-                message: "Course not found or user already enrolled"
+                message: "Course not found"
             });
             return;
         }
 
+        // Handle free courses directly
+        if (course.price === 0) {
+            // Directly enroll user in the course
+            await prisma.course.update({
+                where: { id: courseId },
+                data: {
+                    students: {
+                        connect: { id: userId }
+                    }
+                }
+            });
+
+            res.status(200).json({
+                success: true,
+                message: "Enrolled successfully in free course"
+            });
+            return;
+        }
+
+        // For paid courses, create Razorpay order
         const options: RazorpayOrderOptions = {
-            amount: 500 * 100,
+            amount: Math.max(100, Math.round(course.price * 100)), // Minimum 1 INR (100 paise)
             currency: "INR",
-            receipt: `receipt_${courseId}`,
+            receipt: `receipt_${Date.now()}`,
             notes: {
-                courseId: courseId,
-                userId: userId
+                courseId,
+                userId
             }
         };
 
-        const order = await new Promise<RazorpayOrderResponse>((resolve, reject) => {
-            razorpay.orders.create(options, (err, order) => {
-                if (err) reject(err);
-                else resolve(order as RazorpayOrderResponse);
-            });
-        });
+        const order = await razorpay.orders.create(options);
 
         res.status(200).json({
             success: true,
-            message: "Order created successfully",
             data: {
                 orderId: order.id,
                 amount: order.amount,
