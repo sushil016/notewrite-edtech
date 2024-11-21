@@ -7,13 +7,16 @@ import { BottomGradient } from "./effects/BotttomGradient";
 import Heading from "./headersComponent/Heading";
 import SubHeading from "./headersComponent/SubHeading";
 import { useRouter } from "next/navigation";
-import axiosInstance from '@/lib/axios'; // Use the configured instance
+import { useAuth } from "@/hooks/useAuth";
+import axiosInstance from '@/lib/axios';
+import Cookies from 'js-cookie';
 
 export function OTPVerification() {
     const [otp, setOtp] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const { setUser } = useAuth();
 
     useEffect(() => {
         const signupData = sessionStorage.getItem('signupData');
@@ -30,20 +33,14 @@ export function OTPVerification() {
         try {
             const signupData = JSON.parse(sessionStorage.getItem('signupData') || '{}');
             
-            // Log the retrieved data
-            console.log('Retrieved signup data:', {
+            console.log('Sending signup data:', {
                 ...signupData,
-                password: signupData.password ? '***' : 'undefined',
-                confirmPassword: signupData.confirmPassword ? '***' : 'undefined'
+                otp,
+                password: '***'
             });
 
-            // Validate the data before sending
-            if (!signupData.password || !signupData.confirmPassword) {
-                console.error('Missing password data:', {
-                    hasPassword: !!signupData.password,
-                    hasConfirmPassword: !!signupData.confirmPassword
-                });
-                throw new Error('Password data is missing. Please try signing up again.');
+            if (!signupData.email || !signupData.password || !otp) {
+                throw new Error('Missing required data');
             }
 
             const requestData = {
@@ -51,39 +48,50 @@ export function OTPVerification() {
                 lastName: signupData.lastName,
                 email: signupData.email,
                 password: signupData.password,
-                confirmPassword: signupData.confirmPassword,
                 contactNumber: signupData.contactNumber,
                 accountType: signupData.accountType,
-                otp: otp
+                otp: otp.trim()
             };
-
-            // Log the exact data being sent
-            console.log('Sending request data:', {
-                ...requestData,
-                password: '***',
-                confirmPassword: requestData.confirmPassword ? '***' : 'undefined'
-            });
 
             const response = await axiosInstance.post('/auth/signup', requestData);
 
             if (response.data.success) {
+                const { token, user } = response.data;
+                localStorage.setItem('token', token);
+                Cookies.set('token', token, { expires: 1 });
+                
+                setUser(user);
                 sessionStorage.removeItem('signupData');
                 sessionStorage.removeItem('otpTimestamp');
-                alert('Signup successful! Please login.');
-                router.push('/login');
+
+                switch (user.accountType) {
+                    case 'ADMIN':
+                        router.push('/admin/dashboard');
+                        break;
+                    case 'TEACHER':
+                        router.push('/teacher/dashboard');
+                        break;
+                    case 'STUDENT':
+                    default:
+                        router.push('/dashboard');
+                }
             }
         } catch (error: any) {
             console.error('Signup error:', {
-                error: error.message,
+                error,
                 response: error.response?.data,
-                friendlyMessage: error.friendlyMessage
+                status: error.response?.status
             });
-            const errorMessage = error.response?.data?.message || error.friendlyMessage || 'Failed to verify OTP';
+            
+            const errorMessage = error.response?.data?.message || 
+                               error.friendlyMessage || 
+                               'Failed to verify OTP';
             setError(errorMessage);
             
-            if (errorMessage.includes('password') || errorMessage.includes('Password')) {
+            if (errorMessage.includes('No OTP found') || errorMessage.includes('Invalid OTP')) {
+                setError(errorMessage);
+            } else {
                 sessionStorage.removeItem('signupData');
-                alert('Please try signing up again.');
                 router.push('/signup');
             }
         } finally {
@@ -94,11 +102,19 @@ export function OTPVerification() {
     const handleResendOTP = async () => {
         try {
             const signupData = JSON.parse(sessionStorage.getItem('signupData') || '{}');
-            await axiosInstance.post('/auth/send-otp', {
+            if (!signupData.email) {
+                throw new Error('Email not found');
+            }
+
+            const response = await axiosInstance.post('/auth/send-otp', {
                 email: signupData.email
             });
-            alert("New OTP has been sent to your email!");
-            sessionStorage.setItem('otpTimestamp', Date.now().toString());
+
+            if (response.data.success) {
+                alert("New OTP has been sent to your email!");
+                sessionStorage.setItem('otpTimestamp', Date.now().toString());
+                setOtp('');
+            }
         } catch (error: any) {
             setError(error.response?.data?.message || "Failed to resend OTP!");
         }

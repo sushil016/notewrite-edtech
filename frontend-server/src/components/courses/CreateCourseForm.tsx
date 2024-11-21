@@ -60,7 +60,7 @@ export default function CreateCourseForm() {
     // Fetch categories when component mounts
     const fetchCategories = async () => {
       try {
-        const response = await axiosInstance.get('/api/v1/categories/all');
+        const response = await axiosInstance.get('/categories/all');
         setCategories(response.data.data);
       } catch (error) {
         toast.error('Error fetching categories');
@@ -108,7 +108,7 @@ export default function CreateCourseForm() {
         instructions: instructions // Use the instructions array directly
       };
 
-      const response = await axiosInstance.post('/api/v1/courses/create', formattedData);
+      const response = await axiosInstance.post('/courses/create', formattedData);
       
       if (response.data.success) {
         toast.success('Course created successfully');

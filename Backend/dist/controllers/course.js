@@ -339,7 +339,9 @@ const getCoursePreview = async (req, res) => {
         const course = await app_1.prisma.course.findFirst({
             where: {
                 id: courseId,
-                status: 'PUBLISHED'
+                status: {
+                    in: ['PUBLISHED', 'DRAFT']
+                }
             },
             include: {
                 teacher: {

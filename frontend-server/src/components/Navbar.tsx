@@ -11,15 +11,33 @@ import { UserDropdown } from "./ui/UserDropdown";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 
+const menuVariants = {
+  closed: {
+    opacity: 0,
+    y: -20,
+    transition: {
+      duration: 0.2,
+    },
+  },
+  open: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.3,
+    },
+  },
+};
+
 export function Navbar() {
   const gsapRef = useRef<HTMLDivElement>(null);
-  const { user, isAuthenticated, isLoading, checkAuth } = useAuth();
+  const { user, isAuthenticated, logout, initialize } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Debug logs
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    initialize(); // Ensure authentication state is set
+  }, [initialize]);
 
   useGSAP(() => {
     if (gsapRef.current) {
@@ -33,21 +51,46 @@ export function Navbar() {
     }
   }, []);
 
-  const menuVariants = {
-    closed: {
-      opacity: 0,
-      y: -20,
-      transition: {
-        duration: 0.2,
-      },
-    },
-    open: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-      },
-    },
+  // Render auth section based on state
+  const renderAuthSection = () => {
+    // if (isLoading) {
+    //   return <div className="animate-pulse w-8 h-8 bg-blue-400/10 rounded-full" />;
+    // }
+
+    if (isAuthenticated && user) {
+      return (
+        <UserDropdown
+          user={{
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            accountType: user.accountType,
+          }}
+          onLogout={handleLogout}
+        />
+      );
+    }
+
+    // Show login button immediately if not authenticated and not loading
+    return (
+      <Link href="/login">
+        <MovingButton
+          borderRadius="1rem"
+          className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
+        >
+          <span>Login</span>
+        </MovingButton>
+      </Link>
+    );
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
@@ -56,11 +99,12 @@ export function Navbar() {
         ref={gsapRef}
         className="w-full flex justify-between items-center px-6 py-4 backdrop-blur-sm border-b border-zinc-800 shadow-lg"
       >
+        {/* Logo */}
         <button
           onClick={() => router.push("/")}
           className="text-3xl text-blue-400 font-semibold hover:opacity-80 drop-shadow-2xl duration-200"
         >
-          Robonauts
+          NoteWrite
         </button>
 
         {/* Desktop Navigation */}
@@ -85,30 +129,10 @@ export function Navbar() {
           </button>
         </div>
 
+        {/* Auth Section */}
         <div className="hidden md:flex items-center gap-4">
           <ThemeSwitch />
-
-          {isLoading ? (
-            <div className="animate-pulse w-8 h-8 bg-blue-400/10 rounded-full" />
-          ) : isAuthenticated && user ? (
-            <UserDropdown
-              user={{
-                firstName: user.firstName || '',
-                lastName: user.lastName || '',
-                email: user.email || '',
-                accountType: user.accountType || 'STUDENT',
-              }}
-            />
-          ) : (
-            <Link href="/login">
-              <MovingButton
-                borderRadius="1rem"
-                className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
-              >
-                <span>Login</span>
-              </MovingButton>
-            </Link>
-          )}
+          {renderAuthSection()}
         </div>
 
         {/* Mobile Menu Button */}
@@ -185,25 +209,7 @@ export function Navbar() {
               </button>
               <div className="flex flex-col items-center gap-4 pt-4 border-t border-zinc-700/50 w-full">
                 <ThemeSwitch />
-                {isAuthenticated && user ? (
-                  <UserDropdown
-                    user={{
-                      firstName: user.firstName,
-                      lastName: user.lastName,
-                      email: user.email,
-                      accountType: user.accountType,
-                    }}
-                  />
-                ) : (
-                  <Link href="/login" onClick={() => setIsOpen(false)}>
-                    <MovingButton
-                      borderRadius="1rem"
-                      className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
-                    >
-                      <span>Login</span>
-                    </MovingButton>
-                  </Link>
-                )}
+                {renderAuthSection()}
               </div>
             </div>
           </motion.div>

@@ -9,31 +9,29 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const app_1 = require("../app");
 const signup = async (req, res, next) => {
     try {
-        const { firstName, lastName, email, password, contactNumber, accountType, } = req.body;
+        const { firstName, lastName, email, password, contactNumber, accountType, otp, } = req.body;
+        console.log('Received signup data:', {
+            firstName,
+            lastName,
+            email,
+            contactNumber,
+            accountType,
+            otp,
+            hasPassword: !!password
+        });
         // Validation
-        if (!firstName || !lastName || !email || !password || !contactNumber) {
+        if (!firstName || !lastName || !email || !password || !contactNumber || !otp) {
+            console.log('Missing required fields:', {
+                hasFirstName: !!firstName,
+                hasLastName: !!lastName,
+                hasEmail: !!email,
+                hasPassword: !!password,
+                hasContactNumber: !!contactNumber,
+                hasOTP: !!otp
+            });
             res.status(400).json({
                 success: false,
                 message: "Please fill all required fields",
-            });
-            return;
-        }
-        // if (password !== confirmPassword) {
-        //   console.log('Password mismatch:', { password, confirmPassword });
-        //   res.status(400).json({
-        //     success: false,
-        //     message: "Passwords do not match",
-        //   });
-        //   return;
-        // }
-        // Check if user exists
-        const existingUser = await app_1.prisma.user.findUnique({
-            where: { email },
-        });
-        if (existingUser) {
-            res.status(400).json({
-                success: false,
-                message: "User already exists",
             });
             return;
         }
@@ -42,10 +40,38 @@ const signup = async (req, res, next) => {
             where: { email },
             orderBy: { createdAt: 'desc' },
         });
-        if (!recentOTP || recentOTP.otp !== req.body.otp) {
+        console.log('OTP verification:', {
+            receivedOTP: otp,
+            storedOTP: recentOTP === null || recentOTP === void 0 ? void 0 : recentOTP.otp,
+            email,
+            otpCreatedAt: recentOTP === null || recentOTP === void 0 ? void 0 : recentOTP.createdAt
+        });
+        if (!recentOTP) {
             res.status(400).json({
                 success: false,
-                message: "Invalid OTP",
+                message: "No OTP found for this email go to signup page",
+            });
+            return;
+        }
+        if (recentOTP.otp !== otp) {
+            res.status(400).json({
+                success: false,
+                message: "Invalid OTP from signup page",
+                debug: {
+                    receivedOTP: otp,
+                    storedOTP: recentOTP.otp
+                }
+            });
+            return;
+        }
+        // Check if user exists
+        const existingUser = await app_1.prisma.user.findUnique({
+            where: { email },
+        });
+        if (existingUser) {
+            res.status(400).json({
+                success: false,
+                message: "User already exists",
             });
             return;
         }
@@ -71,18 +97,34 @@ const signup = async (req, res, next) => {
                 profileId: profile.id,
             },
         });
+        // Generate token
+        const token = jsonwebtoken_1.default.sign({
+            id: user.id,
+            email: user.email,
+            accountType: user.accountType
+        }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        // Set cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
         res.status(201).json({
             success: true,
             message: "User created successfully",
+            token,
             user: {
                 id: user.id,
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                accountType: user.accountType,
             },
         });
     }
     catch (error) {
+        console.error('Signup error:', error);
         next(error);
     }
 };
@@ -147,15 +189,27 @@ const verifyAuth = async (req, res, next) => {
             });
             return;
         }
+        // Get full user data from database
+        const user = await app_1.prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: {
+                id: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                accountType: true,
+            }
+        });
+        if (!user) {
+            res.status(401).json({
+                success: false,
+                message: 'User not found'
+            });
+            return;
+        }
         res.json({
             success: true,
-            user: {
-                id: req.user.id,
-                email: req.user.email,
-                firstName: req.user.firstName,
-                lastName: req.user.lastName,
-                accountType: req.user.accountType,
-            }
+            user
         });
     }
     catch (error) {

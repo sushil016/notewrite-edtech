@@ -2,43 +2,48 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Get the pathname
   const path = request.nextUrl.pathname;
 
-  // Define public paths that don't need authentication
-  const isPublicPath = path === '/login' || 
-                      path === '/signup' || 
-                      path === '/verify-otp' || 
-                      path === '/forgot-password' ||
-                      path === '/' ||  // Add home page as public
-                      path === '/courses' || // Add courses page as public
-                      path.startsWith('/courses/'); // Allow course preview pages
+  // Define public paths
+  const isPublicPath = [
+    '/login',
+    '/signup',
+    '/verify-otp',
+    '/forgot-password',
+    '/',
+  ].includes(path) 
+  
+  // Define auth pages
+  const isAuthPage = ['/login', '/signup', '/verify-otp', '/forgot-password'].includes(path);
 
   // Get token from cookies
-  const token = request.cookies.get('token')?.value || '';
+  const token = request.cookies.get('token')?.value;
 
-  // Allow OTP verification without token
-  if (path === '/verify-otp') {
-    return NextResponse.next();
+  const protectedRoutes = ['/dashboard', '/teacher', '/admin'];
+
+
+  if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+  // If user is logged in and trying to access auth pages
+  // if (token && isAuthPage) {
+  //   const redirectUrl = request.cookies.get('redirectUrl')?.value || '/';
+  //   return NextResponse.redirect(new URL(redirectUrl, request.url));
+  // }
+
+  // If user is not logged in and trying to access protected routes
+  if (!token && !isPublicPath) {
+    // Store the attempted URL
+    const response = NextResponse.redirect(new URL('/login', request.url));
+    response.cookies.set('redirectUrl', path);
+    return response;
   }
 
-  // Only redirect authenticated users from auth pages
-  if (isPublicPath && token && (
-    path === '/login' || 
-    path === '/signup' || 
-    path === '/verify-otp' || 
-    path === '/forgot-password'
-  )) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
-  // Only check authentication for protected paths
-  if (!isPublicPath && !token) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  return NextResponse.next();
 }
 
-// Configure which paths the middleware should run on
 export const config = {
   matcher: [
     '/',

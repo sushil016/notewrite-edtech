@@ -19,7 +19,7 @@ export default function MyCoursesPage() {
 
   const fetchEnrolledCourses = async () => {
     try {
-      const response = await axiosInstance.get('/api/v1/courses/enrolled');
+      const response = await axiosInstance.get('/courses/enrolled');
       setEnrolledCourses(response.data.data);
     } catch (error) {
       toast.error('Error fetching enrolled courses');
@@ -51,7 +51,7 @@ export default function MyCoursesPage() {
 
           {enrolledCourses.length === 0 ? (
             <div className="text-center text-gray-400">
-              <p className="mb-4">You haven't enrolled in any courses yet.</p>
+              <p className="mb-4">You haven&apos;t enrolled in any courses yet.</p>
               <MovingButton onClick={() => router.push('/courses')}>
                 Browse Courses
               </MovingButton>

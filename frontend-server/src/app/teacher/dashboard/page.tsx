@@ -25,7 +25,7 @@ export default function TeacherDashboard() {
   const fetchCourses = async () => {
     try {
       console.log('Fetching courses...');
-      const response = await axiosInstance.get('/api/v1/courses/teacher-courses');
+      const response = await axiosInstance.get('/courses/teacher-courses');
       console.log('Response:', response.data);
       setCourses(response.data.data);
     } catch (error) {
@@ -42,12 +42,16 @@ export default function TeacherDashboard() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
             <div className="flex gap-4">
+            <MovingButton onClick={() => router.push('/teacher/createCategory')}>
+                Create New Category
+              </MovingButton>
               <MovingButton onClick={() => router.push('/teacher/my-courses')}>
                 Edit / Review Courses
               </MovingButton>
               <MovingButton onClick={() => router.push('/teacher/createCourse')}>
                 Create New Course
               </MovingButton>
+           
             </div>
           </div>
 

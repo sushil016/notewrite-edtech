@@ -41,7 +41,7 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
     const fetchSections = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get(`/api/v1/sections/course/${courseId}`);
+        const response = await axiosInstance.get(`/sections/course/${courseId}`);
         setSections(response.data.data);
       } catch (error) {
         toast.error('Error fetching sections');
@@ -72,7 +72,7 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
         formData.append('notes', data.notes[0]);
       }
 
-      const response = await axiosInstance.post('/api/v1/subsections/create', formData, {
+      const response = await axiosInstance.post('/subsections/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

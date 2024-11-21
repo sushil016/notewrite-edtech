@@ -151,7 +151,7 @@ export default function CourseReview({ params }: { params: { courseId: string } 
 
   const fetchCourseDetails = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/courses/${params.courseId}/preview`);
+      const response = await axiosInstance.get(`/courses/${params.courseId}/preview`);
       setCourse(response.data.data);
     } catch (error) {
       toast.error('Error fetching course details');
@@ -184,7 +184,7 @@ export default function CourseReview({ params }: { params: { courseId: string } 
   const publishCourse = async () => {
     try {
       console.log('Publishing course:', params.courseId);
-      const response = await axiosInstance.put(`/api/v1/courses/${params.courseId}/publish`);
+      const response = await axiosInstance.put(`/courses/${params.courseId}/publish`);
       
       if (response.data.success) {
         toast.success('Course published successfully');

@@ -22,7 +22,7 @@ export const TopCoursesSection: React.FC<TopCoursesSectionProps> = ({ courses: i
 
   const fetchRecentCourses = async () => {
     try {
-      const response = await axiosInstance.get('/api/v1/courses/recent');
+      const response = await axiosInstance.get('/courses/recent');
       setCourses(response.data.data);
     } catch (error) {
       toast.error('Error fetching recent courses');

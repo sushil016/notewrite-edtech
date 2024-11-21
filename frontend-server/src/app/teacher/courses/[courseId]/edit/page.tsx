@@ -48,7 +48,7 @@ export default function EditCourse({ params }: { params: { courseId: string } })
 
   const fetchCourseDetails = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/courses/${params.courseId}`);
+      const response = await axiosInstance.get(`/courses/${params.courseId}`);
       const courseData = response.data.data;
       setCourse(courseData);
       setTags(courseData.tag || []);
@@ -73,7 +73,7 @@ export default function EditCourse({ params }: { params: { courseId: string } })
 
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await axiosInstance.get('/api/v1/categories/all');
+      const response = await axiosInstance.get('/categories/all');
       setCategories(response.data.data);
     } catch (error) {
       toast.error('Error fetching categories');
@@ -116,7 +116,7 @@ export default function EditCourse({ params }: { params: { courseId: string } })
         instructions: instructions
       };
 
-      const response = await axiosInstance.put(`/api/v1/courses/${params.courseId}`, formattedData);
+      const response = await axiosInstance.put(`/courses/${params.courseId}`, formattedData);
       
       if (response.data.success) {
         toast.success('Course updated successfully');

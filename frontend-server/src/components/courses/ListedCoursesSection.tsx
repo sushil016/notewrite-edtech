@@ -30,7 +30,7 @@ export const ListedCoursesSection = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axiosInstance.get(`/api/v1/courses?page=${page}&limit=9&category=${selectedCategory}&search=${searchTerm}`);
+        const response = await axiosInstance.get(`/courses?page=${page}&limit=9&category=${selectedCategory}&search=${searchTerm}`);
         if (page === 1) {
           setCourses(response.data.data);
         } else {
@@ -51,7 +51,7 @@ export const ListedCoursesSection = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axiosInstance.get('/api/v1/categories/all');
+        const response = await axiosInstance.get('/categories/all');
         setCategories(response.data.data.map((cat: any) => cat.name));
       } catch (error) {
         console.error(error);
@@ -68,7 +68,7 @@ export const ListedCoursesSection = () => {
         return;
       }
 
-      const response = await axiosInstance.post('/api/v1/payments/capture', {
+      const response = await axiosInstance.post('/payments/capture', {
         courseId
       });
 
@@ -91,7 +91,7 @@ export const ListedCoursesSection = () => {
         order_id: response.data.data.orderId,
         handler: async (response: any) => {
           try {
-            await axiosInstance.post('/api/v1/payments/verify', {
+            await axiosInstance.post('/payments/verify', {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,

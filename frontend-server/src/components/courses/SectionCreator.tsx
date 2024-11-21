@@ -28,7 +28,7 @@ export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
 
   const onSubmit = async (data: SectionFormData) => {
     try {
-      const response = await axiosInstance.post('/api/v1/sections/create', {
+      const response = await axiosInstance.post('/sections/create', {
         ...data,
         courseId
       });

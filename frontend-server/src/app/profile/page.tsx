@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
+import { MovingButton } from '@/components/ui/moving-border';
 
 interface Profile {
   id: string;
@@ -18,10 +19,11 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   const fetchProfile = async () => {
     try {
-      const response = await axiosInstance.get('/api/v1/profile');
+      const response = await axiosInstance.get('/profile');
       setProfile(response.data.data);
     } catch (error) {
       toast.error('Error fetching profile');
@@ -69,6 +71,13 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
+              <MovingButton
+                onClick={() => setIsEditing(true)}
+                className="absolute top-4 right-4 bg-primary/20 text-primary"
+                loading={loading}
+              >
+                Edit Profile
+              </MovingButton>
             </div>
           ) : (
             <div>No profile data found</div>

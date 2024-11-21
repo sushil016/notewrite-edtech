@@ -87,17 +87,17 @@ const verifyOTP = async (req, res) => {
         if (otpRecord.otp !== otp) {
             res.status(400).json({
                 success: false,
-                message: "Invalid OTP",
+                message: "Invalid OTP on otp verification page",
             });
             return;
         }
         // Delete the used OTP
-        await prisma.oTP.delete({
-            where: { id: otpRecord.id },
-        });
+        // await prisma.oTP.delete({
+        //   where: { id: otpRecord.id },
+        // });
         res.status(200).json({
             success: true,
-            message: "OTP verified successfully",
+            message: "OTP verified successfully go to signup page",
         });
     }
     catch (error) {

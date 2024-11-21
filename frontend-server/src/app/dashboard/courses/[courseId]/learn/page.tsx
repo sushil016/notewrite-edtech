@@ -25,7 +25,7 @@ export default function LearnPage({ params }: { params: { courseId: string } }) 
 
   const fetchCourseDetails = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/courses/${params.courseId}/learn`);
+      const response = await axiosInstance.get(`/courses/${params.courseId}/learn`);
       const courseData = response.data.data;
       console.log('Course Data:', courseData);
       
@@ -51,7 +51,7 @@ export default function LearnPage({ params }: { params: { courseId: string } }) 
 
   const fetchProgress = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/courses/${params.courseId}/progress`);
+      const response = await axiosInstance.get(`/courses/${params.courseId}/progress`);
       setProgress(response.data.data);
     } catch (error) {
       console.error('Error fetching progress:', error);
@@ -76,7 +76,7 @@ export default function LearnPage({ params }: { params: { courseId: string } }) 
   const handleVideoEnd = async () => {
     try {
       if (currentVideo) {
-        await axiosInstance.post(`/api/v1/courses/${params.courseId}/complete-video`, {
+        await axiosInstance.post(`/courses/${params.courseId}/complete-video`, {
           subSectionId: currentVideo.id
         });
         await fetchProgress();

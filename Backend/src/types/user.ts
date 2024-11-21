@@ -6,6 +6,7 @@ export interface UserInput {
   confirmPassword: string;
   contactNumber: string;
   accountType: 'ADMIN' | 'STUDENT' | 'TEACHER';
+  otp: string;
 }
 
 export interface LoginInput {

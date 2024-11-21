@@ -16,7 +16,7 @@ export default function CourseEnrollment({ params }: { params: { courseId: strin
 
   const fetchCourseDetails = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/courses/${params.courseId}/preview`);
+      const response = await axiosInstance.get(`/courses/${params.courseId}/preview`);
       setCourse(response.data.data);
     } catch (error) {
       toast.error('Error fetching course details');
@@ -32,7 +32,7 @@ export default function CourseEnrollment({ params }: { params: { courseId: strin
 
   const handlePayment = useCallback(async () => {
     try {
-      const response = await axiosInstance.post('/api/v1/payments/capture', {
+      const response = await axiosInstance.post('/payments/capture', {
         courseId: params.courseId
       });
 
@@ -54,7 +54,7 @@ export default function CourseEnrollment({ params }: { params: { courseId: strin
         order_id: response.data.data.orderId,
         handler: async (response: any) => {
           try {
-            await axiosInstance.post('/api/v1/payments/verify', {
+            await axiosInstance.post('/payments/verify', {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,

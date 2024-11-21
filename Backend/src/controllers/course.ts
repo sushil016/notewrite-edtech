@@ -409,7 +409,9 @@ export const getCoursePreview = async (req: Request, res: Response): Promise<voi
     const course = await prisma.course.findFirst({
       where: {
         id: courseId,
-        status: 'PUBLISHED'
+        status: {
+          in: ['PUBLISHED', 'DRAFT']
+        }
       },
       include: {
         teacher: {

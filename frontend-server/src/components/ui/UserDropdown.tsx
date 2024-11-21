@@ -20,10 +20,16 @@ interface User {
 }
 
 interface UserDropdownProps {
-  user: User;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    accountType: "ADMIN" | "STUDENT" | "TEACHER";
+  };
+  onLogout: () => Promise<void>;
 }
 
-export const UserDropdown: React.FC<UserDropdownProps> = ({ user }) => {
+export const UserDropdown: React.FC<UserDropdownProps> = ({ user, onLogout }) => {
   const { logout, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -111,7 +117,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ user }) => {
               <FaCog className="mr-3" /> Settings
             </Link>
             <button
-              onClick={logout}
+              onClick={onLogout}
               className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
             >
               <FaSignOutAlt className="mr-3" /> Logout

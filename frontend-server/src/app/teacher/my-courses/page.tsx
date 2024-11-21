@@ -38,7 +38,7 @@ export default function TeacherCourses() {
 
     const fetchCourses = async () => {
         try {
-            const response = await axiosInstance.get('/api/v1/courses/teacher-courses');
+            const response = await axiosInstance.get('/courses/teacher-courses');
             setCourses(response.data.data);
         } catch (error) {
             toast.error('Error fetching courses');
@@ -65,9 +65,14 @@ export default function TeacherCourses() {
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-between items-center mb-8">
                         <h1 className="text-3xl font-bold text-white">My Courses</h1>
-                        <MovingButton onClick={() => router.push('/teacher/createCourse')}>
-                            <FaPlus className="mr-2" /> Create New Course
+                       <div>
+                       <MovingButton onClick={() => router.push('/teacher/createCategory')}>
+                            Create New Category
                         </MovingButton>
+                        <MovingButton className="flex items-center flex-row" onClick={() => router.push('/teacher/createCourse')}>
+                            <span>Create New Course</span> 
+                        </MovingButton>
+                       </div>
                     </div>
 
                     {loading ? (

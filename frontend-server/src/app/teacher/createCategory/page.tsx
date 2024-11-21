@@ -18,7 +18,7 @@ const categorySchema = z.object({
 
 type CategoryFormData = z.infer<typeof categorySchema>;
 
-export default function Dashboard() {
+export default function DashboardCategory() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [categories, setCategories] = useState<Array<{ id: string; name: string; description: string }>>([]);
@@ -29,7 +29,7 @@ export default function Dashboard() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axiosInstance.get('/api/v1/categories/all');
+      const response = await axiosInstance.get('/categories/all');
       setCategories(response.data.data);
     } catch (error) {
       toast.error('Error fetching categories');
@@ -55,7 +55,7 @@ export default function Dashboard() {
 
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      const response = await axiosInstance.post('/api/v1/categories/create', data);
+      const response = await axiosInstance.post('/categories/create', data);
       toast.success('Category created successfully');
       reset();
       fetchCategories();
