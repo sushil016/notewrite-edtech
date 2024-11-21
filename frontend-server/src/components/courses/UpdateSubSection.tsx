@@ -14,9 +14,14 @@ const updateSubSectionSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   timeDuration: z.string().min(1, 'Duration is required'),
-  video: z.any().optional(),
-  notes: z.any().optional()
+  video: z.instanceof(FileList).optional(),
+  notes: z.instanceof(FileList).optional()
 });
+
+type FormData = z.infer<typeof updateSubSectionSchema> & {
+  video?: FileList;
+  notes?: FileList;
+};
 
 interface UpdateSubSectionProps {
   subSection: {
@@ -33,7 +38,7 @@ interface UpdateSubSectionProps {
 export function UpdateSubSection({ subSection, onComplete }: UpdateSubSectionProps) {
   const [existingNotes, setExistingNotes] = useState<string[]>(subSection.notesUrls || []);
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(updateSubSectionSchema),
     defaultValues: {
       title: subSection.title,
@@ -68,7 +73,7 @@ export function UpdateSubSection({ subSection, onComplete }: UpdateSubSectionPro
       
       // Handle multiple PDF files
       if (data.notes) {
-        Array.from(data.notes).forEach((file: File) => {
+        Array.from(data.notes as FileList).forEach((file: File) => {
           formData.append('notes', file);
         });
       }

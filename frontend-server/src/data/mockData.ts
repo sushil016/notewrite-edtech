@@ -41,83 +41,17 @@ export const testimonials: Testimonial[] = [
   export const courses: Course[] = [
     {
       id: "1",
-      title: "Python for Beginners",
-      description: "Start your programming journey with Python, perfect for newcomers to coding.",
-      thumbnail: "",
-      duration: "4 weeks",
-      instructor: { name: "John Doe", photo: "" },
-      rating: 4.5,
-      enrolledStudents: 1000,
-      difficulty: "Beginner",
+      courseName: "Python for Beginners",
+      courseDescription: "Start your programming journey with Python, perfect for newcomers to coding.",
+      whatYouWillLearn: "Learn the basics of Python, including variables, data types, and control structures.",
+      status: "PUBLISHED",
       price: 49.99,
-      category: "Programming"
+      category: { id: "programming", name: "Programming" },
+      tag: ["Python", "Beginner"],
+      instructions: ["No special instructions required"]
     },
-    {
-      id: "2",
-      title: "Advanced JavaScript Techniques",
-      description: "Take your JavaScript skills to the next level with advanced concepts and patterns.",
-      thumbnail: "",
-      duration: "6 weeks",
-      instructor: { name: "Jane Smith", photo: "" },
-      rating: 4.7,
-      enrolledStudents: 800,
-      difficulty: "Advanced",
-      price: 79.99,
-      category: "Web Development"
-    },
-    {
-      id: "3",
-      title: "Data Visualization with D3.js",
-      description: "Learn to create stunning data visualizations using D3.js library.",
-      thumbnail: "",
-      duration: "5 weeks",
-      instructor: { name: "Alex Johnson", photo: "" },
-      rating: 4.6,
-      enrolledStudents: 600,
-      difficulty: "Intermediate",
-      price: 69.99,
-      category: "Data Science"
-    },
-    {
-      id: "4",
-      title: "Machine Learning Fundamentals",
-      description: "Explore the core concepts of machine learning and build your first ML models.",
-      thumbnail: "",
-      duration: "8 weeks",
-      instructor: { name: "Emily Chen", photo: "" },
-      rating: 4.8,
-      enrolledStudents: 750,
-      difficulty: "Intermediate",
-      price: 89.99,
-      category: "Data Science"
-    },
-    {
-      id: "5",
-      title: "React Native for Mobile Development",
-      description: "Build cross-platform mobile apps using React Native framework.",
-      thumbnail: "",
-      duration: "7 weeks",
-      instructor: { name: "Mike Wilson", photo: "" },
-      rating: 4.5,
-      enrolledStudents: 550,
-      difficulty: "Intermediate",
-      price: 74.99,
-      category: "Mobile Development"
-    },
-    {
-      id: "6",
-      title: "UI/UX Design Principles",
-      description: "Master the fundamentals of user interface and user experience design.",
-      thumbnail: "",
-      duration: "6 weeks",
-      instructor: { name: "Sarah Lee", photo: "" },
-      rating: 4.9,
-      enrolledStudents: 900,
-      difficulty: "Beginner",
-      price: 59.99,
-      category: "Design"
-    },
+ 
   ]
   
-  export const categories = ["All", "Programming", "Web Development", "Data Science", "Mobile Development", "Design"]
+  export const categories = ["All"]
 

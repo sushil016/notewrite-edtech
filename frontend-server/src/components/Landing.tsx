@@ -7,7 +7,7 @@ import { Source_Code_Pro } from "next/font/google";
 import { TopCoursesSection } from './courses/TopCoursesSection';
 import { TestimonialsSection } from "./testimonials/TestimonialsSection";
 import HomePageCard from "./HomePageCard";
-import { courses, testimonials } from '../data/mockData';
+import { testimonials, courses } from '../data/mockData';
 
 const codepro = Source_Code_Pro({ weight: "400", subsets: ["latin"] });
 
