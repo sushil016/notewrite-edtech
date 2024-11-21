@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,7 +16,7 @@ exports.verifyAuth = exports.login = exports.signup = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const app_1 = require("../app");
-const signup = async (req, res, next) => {
+const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { firstName, lastName, email, password, contactNumber, accountType, otp, } = req.body;
         console.log('Received signup data:', {
@@ -36,7 +45,7 @@ const signup = async (req, res, next) => {
             return;
         }
         // Verify OTP
-        const recentOTP = await app_1.prisma.oTP.findFirst({
+        const recentOTP = yield app_1.prisma.oTP.findFirst({
             where: { email },
             orderBy: { createdAt: 'desc' },
         });
@@ -65,7 +74,7 @@ const signup = async (req, res, next) => {
             return;
         }
         // Check if user exists
-        const existingUser = await app_1.prisma.user.findUnique({
+        const existingUser = yield app_1.prisma.user.findUnique({
             where: { email },
         });
         if (existingUser) {
@@ -76,7 +85,7 @@ const signup = async (req, res, next) => {
             return;
         }
         // Create profile
-        const profile = await app_1.prisma.profile.create({
+        const profile = yield app_1.prisma.profile.create({
             data: {
                 gender: null,
                 dateOfBirth: null,
@@ -84,9 +93,9 @@ const signup = async (req, res, next) => {
             },
         });
         // Hash password
-        const hashedPassword = await bcrypt_1.default.hash(password, 10);
+        const hashedPassword = yield bcrypt_1.default.hash(password, 10);
         // Create user
-        const user = await app_1.prisma.user.create({
+        const user = yield app_1.prisma.user.create({
             data: {
                 firstName,
                 lastName,
@@ -127,12 +136,12 @@ const signup = async (req, res, next) => {
         console.error('Signup error:', error);
         next(error);
     }
-};
+});
 exports.signup = signup;
-const login = async (req, res, next) => {
+const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
-        const user = await app_1.prisma.user.findUnique({
+        const user = yield app_1.prisma.user.findUnique({
             where: { email }
         });
         if (!user) {
@@ -142,7 +151,7 @@ const login = async (req, res, next) => {
             });
             return;
         }
-        const validPassword = await bcrypt_1.default.compare(password, user.password);
+        const validPassword = yield bcrypt_1.default.compare(password, user.password);
         if (!validPassword) {
             res.status(401).json({
                 success: false,
@@ -178,9 +187,9 @@ const login = async (req, res, next) => {
     catch (error) {
         next(error);
     }
-};
+});
 exports.login = login;
-const verifyAuth = async (req, res, next) => {
+const verifyAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.user) {
             res.status(401).json({
@@ -190,7 +199,7 @@ const verifyAuth = async (req, res, next) => {
             return;
         }
         // Get full user data from database
-        const user = await app_1.prisma.user.findUnique({
+        const user = yield app_1.prisma.user.findUnique({
             where: { id: req.user.id },
             select: {
                 id: true,
@@ -215,5 +224,5 @@ const verifyAuth = async (req, res, next) => {
     catch (error) {
         next(error);
     }
-};
+});
 exports.verifyAuth = verifyAuth;

@@ -1,9 +1,18 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.markVideoComplete = exports.getCourseProgress = exports.getCourseLearningDetails = exports.getEnrolledCourses = exports.getCoursePreview = exports.getAllCourses = exports.getRecentCourses = exports.updateCourse = exports.publishCourse = exports.getCourseDetails = exports.getTeacherCourses = exports.createCourse = void 0;
 const mailSender_1 = require("../utils/mailSender");
 const app_1 = require("../app");
-const createCourse = async (req, res) => {
+const createCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseName, courseDescription, whatYouWillLearn, price, tag, categoryId, instructions } = req.body;
         const userId = req.user.id;
@@ -17,7 +26,7 @@ const createCourse = async (req, res) => {
         const tagArray = Array.isArray(tag) ? tag : [tag];
         const instructionsArray = Array.isArray(instructions) ? instructions : [instructions];
         const coursePrice = typeof price === 'string' ? parseFloat(price) : price;
-        const course = await app_1.prisma.course.create({
+        const course = yield app_1.prisma.course.create({
             data: {
                 courseName,
                 courseDescription,
@@ -38,7 +47,7 @@ const createCourse = async (req, res) => {
             }
         });
         // Send email notification
-        await (0, mailSender_1.sendMail)({
+        yield (0, mailSender_1.sendMail)({
             email: req.user.email,
             subject: "Course Created Successfully",
             text: `Your course ${courseName} has been created successfully.`
@@ -56,12 +65,12 @@ const createCourse = async (req, res) => {
             message: "Error creating course"
         });
     }
-};
+});
 exports.createCourse = createCourse;
-const getTeacherCourses = async (req, res) => {
+const getTeacherCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const teacherId = req.user.id;
-        const courses = await app_1.prisma.course.findMany({
+        const courses = yield app_1.prisma.course.findMany({
             where: {
                 teacherId
             },
@@ -97,13 +106,13 @@ const getTeacherCourses = async (req, res) => {
             message: "Error fetching courses"
         });
     }
-};
+});
 exports.getTeacherCourses = getTeacherCourses;
-const getCourseDetails = async (req, res) => {
+const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseId } = req.params;
         const teacherId = req.user.id;
-        const course = await app_1.prisma.course.findFirst({
+        const course = yield app_1.prisma.course.findFirst({
             where: {
                 id: courseId,
                 teacherId
@@ -137,15 +146,15 @@ const getCourseDetails = async (req, res) => {
             message: "Error fetching course details"
         });
     }
-};
+});
 exports.getCourseDetails = getCourseDetails;
-const publishCourse = async (req, res) => {
+const publishCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseId } = req.params;
         const teacherId = req.user.id;
         console.log('Publishing course:', { courseId, teacherId });
         // Verify course ownership
-        const course = await app_1.prisma.course.findFirst({
+        const course = yield app_1.prisma.course.findFirst({
             where: {
                 id: courseId,
                 teacherId,
@@ -177,12 +186,12 @@ const publishCourse = async (req, res) => {
             return;
         }
         // Update course status to published
-        const updatedCourse = await app_1.prisma.course.update({
+        const updatedCourse = yield app_1.prisma.course.update({
             where: { id: courseId },
             data: { status: 'PUBLISHED' },
         });
         // Send email notification
-        await (0, mailSender_1.sendMail)({
+        yield (0, mailSender_1.sendMail)({
             email: req.user.email,
             subject: "Course Published Successfully",
             text: `Your course ${course.courseName} has been published successfully.`,
@@ -200,15 +209,15 @@ const publishCourse = async (req, res) => {
             message: "Error publishing course",
         });
     }
-};
+});
 exports.publishCourse = publishCourse;
-const updateCourse = async (req, res) => {
+const updateCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseId } = req.params;
         const teacherId = req.user.id;
         const updateData = req.body;
         // Verify course ownership
-        const course = await app_1.prisma.course.findFirst({
+        const course = yield app_1.prisma.course.findFirst({
             where: {
                 id: courseId,
                 teacherId
@@ -221,7 +230,7 @@ const updateCourse = async (req, res) => {
             });
             return;
         }
-        const updatedCourse = await app_1.prisma.course.update({
+        const updatedCourse = yield app_1.prisma.course.update({
             where: { id: courseId },
             data: updateData,
             include: {
@@ -242,11 +251,11 @@ const updateCourse = async (req, res) => {
             message: "Error updating course"
         });
     }
-};
+});
 exports.updateCourse = updateCourse;
-const getRecentCourses = async (req, res) => {
+const getRecentCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const courses = await app_1.prisma.course.findMany({
+        const courses = yield app_1.prisma.course.findMany({
             where: {
                 status: 'PUBLISHED'
             },
@@ -276,9 +285,9 @@ const getRecentCourses = async (req, res) => {
             message: "Error fetching courses"
         });
     }
-};
+});
 exports.getRecentCourses = getRecentCourses;
-const getAllCourses = async (req, res) => {
+const getAllCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 9;
@@ -295,7 +304,7 @@ const getAllCourses = async (req, res) => {
                 { courseDescription: { contains: search, mode: 'insensitive' } }
             ]
         }));
-        const [courses, totalCount] = await Promise.all([
+        const [courses, totalCount] = yield Promise.all([
             app_1.prisma.course.findMany({
                 where,
                 skip,
@@ -331,12 +340,12 @@ const getAllCourses = async (req, res) => {
             message: "Error fetching courses"
         });
     }
-};
+});
 exports.getAllCourses = getAllCourses;
-const getCoursePreview = async (req, res) => {
+const getCoursePreview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseId } = req.params;
-        const course = await app_1.prisma.course.findFirst({
+        const course = yield app_1.prisma.course.findFirst({
             where: {
                 id: courseId,
                 status: {
@@ -384,12 +393,12 @@ const getCoursePreview = async (req, res) => {
             message: "Error fetching course"
         });
     }
-};
+});
 exports.getCoursePreview = getCoursePreview;
-const getEnrolledCourses = async (req, res) => {
+const getEnrolledCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user.id;
-        const enrolledCourses = await app_1.prisma.user.findUnique({
+        const enrolledCourses = yield app_1.prisma.user.findUnique({
             where: { id: userId },
             select: {
                 enrolledCourses: {
@@ -431,14 +440,14 @@ const getEnrolledCourses = async (req, res) => {
             message: "Error fetching enrolled courses"
         });
     }
-};
+});
 exports.getEnrolledCourses = getEnrolledCourses;
-const getCourseLearningDetails = async (req, res) => {
+const getCourseLearningDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseId } = req.params;
         const userId = req.user.id;
         // Check if user is enrolled in the course
-        const enrollment = await app_1.prisma.course.findFirst({
+        const enrollment = yield app_1.prisma.course.findFirst({
             where: {
                 id: courseId,
                 students: {
@@ -489,14 +498,14 @@ const getCourseLearningDetails = async (req, res) => {
             message: "Error fetching course details"
         });
     }
-};
+});
 exports.getCourseLearningDetails = getCourseLearningDetails;
-const getCourseProgress = async (req, res) => {
+const getCourseProgress = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseId } = req.params;
         const userId = req.user.id;
         // Get course progress
-        const progress = await app_1.prisma.courseProgress.findFirst({
+        const progress = yield app_1.prisma.courseProgress.findFirst({
             where: {
                 userId,
                 courseId
@@ -510,7 +519,7 @@ const getCourseProgress = async (req, res) => {
             }
         });
         // Get total videos in course
-        const course = await app_1.prisma.course.findUnique({
+        const course = yield app_1.prisma.course.findUnique({
             where: { id: courseId },
             include: {
                 sections: {
@@ -547,22 +556,22 @@ const getCourseProgress = async (req, res) => {
             message: "Error fetching course progress"
         });
     }
-};
+});
 exports.getCourseProgress = getCourseProgress;
-const markVideoComplete = async (req, res) => {
+const markVideoComplete = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseId } = req.params;
         const { subSectionId } = req.body;
         const userId = req.user.id;
         // Get or create course progress
-        let progress = await app_1.prisma.courseProgress.findFirst({
+        let progress = yield app_1.prisma.courseProgress.findFirst({
             where: {
                 userId,
                 courseId
             }
         });
         if (!progress) {
-            progress = await app_1.prisma.courseProgress.create({
+            progress = yield app_1.prisma.courseProgress.create({
                 data: {
                     userId,
                     courseId
@@ -570,7 +579,7 @@ const markVideoComplete = async (req, res) => {
             });
         }
         // Mark video as completed
-        await app_1.prisma.courseProgress.update({
+        yield app_1.prisma.courseProgress.update({
             where: {
                 id: progress.id
             },
@@ -594,5 +603,5 @@ const markVideoComplete = async (req, res) => {
             message: "Error updating progress"
         });
     }
-};
+});
 exports.markVideoComplete = markVideoComplete;

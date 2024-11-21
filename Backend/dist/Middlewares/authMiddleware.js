@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,7 +16,7 @@ exports.isStudent = exports.isAdmin = exports.isTeacher = exports.authenticateUs
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const app_1 = require("../app");
 const client_1 = require("@prisma/client");
-const authenticateUser = async (req, res, next) => {
+const authenticateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         // Check both Authorization header and cookies
@@ -24,7 +33,7 @@ const authenticateUser = async (req, res, next) => {
         }
         try {
             const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-            const user = await app_1.prisma.user.findUnique({
+            const user = yield app_1.prisma.user.findUnique({
                 where: { id: decoded.id },
                 select: {
                     id: true,
@@ -56,7 +65,7 @@ const authenticateUser = async (req, res, next) => {
     catch (error) {
         next(error);
     }
-};
+});
 exports.authenticateUser = authenticateUser;
 const isTeacher = (req, res, next) => {
     var _a;

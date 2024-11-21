@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,7 +16,7 @@ exports.changePassword = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const mailSender_1 = require("../utils/mailSender");
 const app_1 = require("../app");
-const changePassword = async (req, res, next) => {
+const changePassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         const { oldPassword, newPassword, confirmNewPassword } = req.body;
@@ -26,7 +35,7 @@ const changePassword = async (req, res, next) => {
             });
             return;
         }
-        const user = await app_1.prisma.user.findUnique({
+        const user = yield app_1.prisma.user.findUnique({
             where: { id: userId },
         });
         if (!user) {
@@ -36,7 +45,7 @@ const changePassword = async (req, res, next) => {
             });
             return;
         }
-        const isOldPasswordValid = await bcrypt_1.default.compare(oldPassword, user.password);
+        const isOldPasswordValid = yield bcrypt_1.default.compare(oldPassword, user.password);
         if (!isOldPasswordValid) {
             res.status(401).json({
                 success: false,
@@ -51,13 +60,13 @@ const changePassword = async (req, res, next) => {
             });
             return;
         }
-        const hashedNewPassword = await bcrypt_1.default.hash(newPassword, 10);
-        await app_1.prisma.user.update({
+        const hashedNewPassword = yield bcrypt_1.default.hash(newPassword, 10);
+        yield app_1.prisma.user.update({
             where: { id: userId },
             data: { password: hashedNewPassword },
         });
         // Send password update notification email
-        await (0, mailSender_1.sendMail)({
+        yield (0, mailSender_1.sendMail)({
             email: user.email,
             subject: "Password Updated Successfully",
             text: "Your password has been successfully updated. If you didn't make this change, please contact support immediately.",
@@ -70,5 +79,5 @@ const changePassword = async (req, res, next) => {
     catch (error) {
         next(error);
     }
-};
+});
 exports.changePassword = changePassword;

@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __rest = (this && this.__rest) || function (s, e) {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
@@ -15,10 +24,10 @@ exports.uploadProfileImage = exports.updateProfile = exports.getUserProfile = vo
 const client_1 = require("@prisma/client");
 const imageUploader_1 = require("../utils/imageUploader");
 const prisma = new client_1.PrismaClient();
-const getUserProfile = async (req, res) => {
+const getUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user.id;
-        const user = await prisma.user.findUnique({
+        const user = yield prisma.user.findUnique({
             where: { id: userId },
             include: {
                 profile: true,
@@ -44,24 +53,24 @@ const getUserProfile = async (req, res) => {
             message: 'Internal server error',
         });
     }
-};
+});
 exports.getUserProfile = getUserProfile;
-const updateProfile = async (req, res) => {
+const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user.id;
         const { firstName, lastName, contactNumber, gender, dateOfBirth, about, } = req.body;
         let imageUrl = null;
         if (req.file) {
-            imageUrl = await (0, imageUploader_1.uploadImageToCloudinary)(req.file.path, 'profile-pictures');
+            imageUrl = yield (0, imageUploader_1.uploadImageToCloudinary)(req.file.path, 'profile-pictures');
         }
-        const updatedUser = await prisma.$transaction(async (prisma) => {
-            const user = await prisma.user.update({
+        const updatedUser = yield prisma.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+            const user = yield prisma.user.update({
                 where: { id: userId },
                 data: Object.assign({ firstName,
                     lastName,
                     contactNumber }, (imageUrl && { image: imageUrl })),
             });
-            const profile = await prisma.profile.update({
+            const profile = yield prisma.profile.update({
                 where: { id: user.profileId },
                 data: {
                     gender,
@@ -70,7 +79,7 @@ const updateProfile = async (req, res) => {
                 },
             });
             return Object.assign(Object.assign({}, user), { profile });
-        });
+        }));
         const { password, token, resetPasswordExpires } = updatedUser, userInfo = __rest(updatedUser, ["password", "token", "resetPasswordExpires"]);
         res.status(200).json({
             success: true,
@@ -85,9 +94,9 @@ const updateProfile = async (req, res) => {
             message: 'Failed to update profile',
         });
     }
-};
+});
 exports.updateProfile = updateProfile;
-const uploadProfileImage = async (req, res) => {
+const uploadProfileImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.file) {
             res.status(400).json({
@@ -96,7 +105,7 @@ const uploadProfileImage = async (req, res) => {
             });
             return;
         }
-        const imageUrl = await (0, imageUploader_1.uploadImageToCloudinary)(req.file.path, 'profile-pictures');
+        const imageUrl = yield (0, imageUploader_1.uploadImageToCloudinary)(req.file.path, 'profile-pictures');
         if (!imageUrl) {
             res.status(500).json({
                 success: false,
@@ -116,5 +125,5 @@ const uploadProfileImage = async (req, res) => {
             message: 'Failed to upload image'
         });
     }
-};
+});
 exports.uploadProfileImage = uploadProfileImage;

@@ -22,6 +22,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -31,10 +40,10 @@ const app_1 = __importStar(require("./app"));
 dotenv_1.default.config();
 const PORT = process.env.PORT || 8000;
 // Database connection and server start
-const startServer = async () => {
+const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Test database connection
-        await app_1.prisma.$connect();
+        yield app_1.prisma.$connect();
         console.log('✅ Database connected successfully');
         // Start server
         app_1.default.listen(PORT, () => {
@@ -45,7 +54,7 @@ const startServer = async () => {
         console.error('❌ Database connection failed:', error);
         process.exit(1);
     }
-};
+});
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error);
@@ -59,8 +68,8 @@ process.on('unhandledRejection', (error) => {
 // Start the server
 startServer();
 // Cleanup on server shutdown
-process.on('SIGTERM', async () => {
+process.on('SIGTERM', () => __awaiter(void 0, void 0, void 0, function* () {
     console.log('SIGTERM received. Shutting down gracefully...');
-    await app_1.prisma.$disconnect();
+    yield app_1.prisma.$disconnect();
     process.exit(0);
-});
+}));

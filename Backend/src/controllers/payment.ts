@@ -47,9 +47,9 @@ type CapturePaymentRequest = AuthRequest & { body: CapturePaymentBody };
 type VerifyPaymentRequest = AuthRequest & { body: VerifyPaymentBody };
 
 // Check if required environment variables are present
-if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_SECRET) {
-    throw new Error('RAZORPAY_KEY_ID and RAZORPAY_SECRET must be present in environment variables');
-}
+// if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_SECRET) {
+//     throw new Error('RAZORPAY_KEY_ID and RAZORPAY_SECRET must be present in environment variables');
+// }
 
 // Initialize Razorpay with type assertion
 const razorpay = new Razorpay({

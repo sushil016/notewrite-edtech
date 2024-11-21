@@ -1,9 +1,18 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteNote = exports.deleteSubSection = exports.updateSubSection = exports.createSubSection = void 0;
 const app_1 = require("../app");
 const cloudinary_1 = require("../utils/cloudinary");
-const createSubSection = async (req, res) => {
+const createSubSection = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
         const { title, description, timeDuration, sectionId } = req.body;
@@ -16,7 +25,7 @@ const createSubSection = async (req, res) => {
             return;
         }
         // Verify the section belongs to a course owned by the teacher
-        const section = await app_1.prisma.section.findFirst({
+        const section = yield app_1.prisma.section.findFirst({
             where: {
                 id: sectionId,
                 course: {
@@ -32,7 +41,7 @@ const createSubSection = async (req, res) => {
             return;
         }
         // Upload video to cloudinary
-        const videoResult = await (0, cloudinary_1.uploadToCloudinary)(req.files.video[0].path, 'course-videos');
+        const videoResult = yield (0, cloudinary_1.uploadToCloudinary)(req.files.video[0].path, 'course-videos');
         if (!videoResult) {
             res.status(500).json({
                 success: false,
@@ -43,12 +52,12 @@ const createSubSection = async (req, res) => {
         // Upload PDF if present and initialize notesUrls array
         let notesUrls = [];
         if ((_b = req.files.notes) === null || _b === void 0 ? void 0 : _b[0]) {
-            const notesResult = await (0, cloudinary_1.uploadToCloudinary)(req.files.notes[0].path, 'course-notes');
+            const notesResult = yield (0, cloudinary_1.uploadToCloudinary)(req.files.notes[0].path, 'course-notes');
             if (notesResult) {
                 notesUrls.push(notesResult.secure_url);
             }
         }
-        const subSection = await app_1.prisma.subSection.create({
+        const subSection = yield app_1.prisma.subSection.create({
             data: {
                 title,
                 description,
@@ -73,16 +82,16 @@ const createSubSection = async (req, res) => {
             message: "Error creating subsection"
         });
     }
-};
+});
 exports.createSubSection = createSubSection;
-const updateSubSection = async (req, res) => {
+const updateSubSection = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
     try {
         const { title, description, timeDuration } = req.body;
         const { subSectionId } = req.params;
         const teacherId = req.user.id;
         // Verify ownership
-        const subSection = await app_1.prisma.subSection.findFirst({
+        const subSection = yield app_1.prisma.subSection.findFirst({
             where: {
                 id: subSectionId,
                 section: {
@@ -101,7 +110,7 @@ const updateSubSection = async (req, res) => {
         }
         let videoUrl = subSection.videoUrl;
         if ((_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a.video) === null || _b === void 0 ? void 0 : _b[0]) {
-            const videoResult = await (0, cloudinary_1.uploadToCloudinary)(req.files.video[0].path, 'course-videos');
+            const videoResult = yield (0, cloudinary_1.uploadToCloudinary)(req.files.video[0].path, 'course-videos');
             if (videoResult) {
                 videoUrl = videoResult.secure_url;
             }
@@ -110,13 +119,13 @@ const updateSubSection = async (req, res) => {
         let notesUrls = subSection.notesUrls || [];
         if ((_c = req.files) === null || _c === void 0 ? void 0 : _c.notes) {
             const notePromises = req.files.notes.map(note => (0, cloudinary_1.uploadToCloudinary)(note.path, 'course-notes'));
-            const noteResults = await Promise.all(notePromises);
+            const noteResults = yield Promise.all(notePromises);
             const newNoteUrls = noteResults
                 .filter(result => result !== null)
                 .map(result => result.secure_url);
             notesUrls = [...notesUrls, ...newNoteUrls];
         }
-        const updatedSubSection = await app_1.prisma.subSection.update({
+        const updatedSubSection = yield app_1.prisma.subSection.update({
             where: { id: subSectionId },
             data: {
                 title,
@@ -139,14 +148,14 @@ const updateSubSection = async (req, res) => {
             message: "Error updating subsection"
         });
     }
-};
+});
 exports.updateSubSection = updateSubSection;
-const deleteSubSection = async (req, res) => {
+const deleteSubSection = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { subSectionId } = req.params;
         const teacherId = req.user.id;
         // Verify the subsection belongs to a course owned by the teacher
-        const subSection = await app_1.prisma.subSection.findFirst({
+        const subSection = yield app_1.prisma.subSection.findFirst({
             where: {
                 id: subSectionId,
                 section: {
@@ -163,7 +172,7 @@ const deleteSubSection = async (req, res) => {
             });
             return;
         }
-        await app_1.prisma.subSection.delete({
+        yield app_1.prisma.subSection.delete({
             where: { id: subSectionId }
         });
         res.status(200).json({
@@ -178,14 +187,14 @@ const deleteSubSection = async (req, res) => {
             message: "Error deleting subsection"
         });
     }
-};
+});
 exports.deleteSubSection = deleteSubSection;
-const deleteNote = async (req, res) => {
+const deleteNote = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { subSectionId } = req.params;
         const { noteUrl } = req.body;
         const teacherId = req.user.id;
-        const subSection = await app_1.prisma.subSection.findFirst({
+        const subSection = yield app_1.prisma.subSection.findFirst({
             where: {
                 id: subSectionId,
                 section: {
@@ -203,7 +212,7 @@ const deleteNote = async (req, res) => {
             return;
         }
         const updatedNotes = subSection.notesUrls.filter(url => url !== noteUrl);
-        await app_1.prisma.subSection.update({
+        yield app_1.prisma.subSection.update({
             where: { id: subSectionId },
             data: {
                 notesUrls: updatedNotes
@@ -221,5 +230,5 @@ const deleteNote = async (req, res) => {
             message: "Error deleting note"
         });
     }
-};
+});
 exports.deleteNote = deleteNote;

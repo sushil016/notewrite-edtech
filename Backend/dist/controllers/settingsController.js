@@ -1,18 +1,27 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePassword = exports.updateSettings = exports.getUserSettings = void 0;
 const client_1 = require("@prisma/client");
 const passwordUtils_1 = require("../utils/passwordUtils");
 const prisma = new client_1.PrismaClient();
-const getUserSettings = async (req, res) => {
+const getUserSettings = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user.id;
-        const settings = await prisma.userSettings.findUnique({
+        const settings = yield prisma.userSettings.findUnique({
             where: { userId },
         });
         if (!settings) {
             // Create default settings if they don't exist
-            const defaultSettings = await prisma.userSettings.create({
+            const defaultSettings = yield prisma.userSettings.create({
                 data: {
                     userId,
                     theme: 'dark',
@@ -49,13 +58,13 @@ const getUserSettings = async (req, res) => {
         });
         return;
     }
-};
+});
 exports.getUserSettings = getUserSettings;
-const updateSettings = async (req, res) => {
+const updateSettings = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user.id;
         const { theme, fontSize, notifications, privacy } = req.body;
-        const updatedSettings = await prisma.userSettings.upsert({
+        const updatedSettings = yield prisma.userSettings.upsert({
             where: { userId },
             update: {
                 theme,
@@ -84,13 +93,13 @@ const updateSettings = async (req, res) => {
             message: 'Failed to update settings',
         });
     }
-};
+});
 exports.updateSettings = updateSettings;
-const updatePassword = async (req, res) => {
+const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user.id;
         const { currentPassword, newPassword } = req.body;
-        const user = await prisma.user.findUnique({
+        const user = yield prisma.user.findUnique({
             where: { id: userId },
         });
         if (!user) {
@@ -99,15 +108,15 @@ const updatePassword = async (req, res) => {
                 message: 'User not found',
             });
         }
-        const isPasswordValid = await (0, passwordUtils_1.comparePassword)(currentPassword, user.password);
+        const isPasswordValid = yield (0, passwordUtils_1.comparePassword)(currentPassword, user.password);
         if (!isPasswordValid) {
             return res.status(400).json({
                 success: false,
                 message: 'Current password is incorrect',
             });
         }
-        const hashedPassword = await (0, passwordUtils_1.hashPassword)(newPassword);
-        await prisma.user.update({
+        const hashedPassword = yield (0, passwordUtils_1.hashPassword)(newPassword);
+        yield prisma.user.update({
             where: { id: userId },
             data: { password: hashedPassword },
         });
@@ -123,5 +132,5 @@ const updatePassword = async (req, res) => {
             message: 'Failed to update password',
         });
     }
-};
+});
 exports.updatePassword = updatePassword;

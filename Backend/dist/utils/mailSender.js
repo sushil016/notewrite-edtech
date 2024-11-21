@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -16,11 +25,11 @@ const transporter = nodemailer_1.default.createTransport({
     },
     debug: true // Enable debug logs
 });
-const sendMail = async (mailData) => {
+const sendMail = (mailData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Verify connection configuration
-        await transporter.verify();
-        const info = await transporter.sendMail({
+        yield transporter.verify();
+        const info = yield transporter.sendMail({
             from: `"StudyNotion" <${process.env.SMTP_FROM}>`,
             to: mailData.email,
             subject: mailData.subject,
@@ -34,5 +43,5 @@ const sendMail = async (mailData) => {
         console.error("Error sending email:", error);
         throw error;
     }
-};
+});
 exports.sendMail = sendMail;

@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,11 +18,11 @@ const otp_generator_1 = __importDefault(require("otp-generator"));
 const mailSender_1 = require("../utils/mailSender");
 const emailTemplates_1 = require("../utils/emailTemplates");
 const prisma = new client_1.PrismaClient();
-const sendOTP = async (req, res) => {
+const sendOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.body;
         // Check if user exists
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = yield prisma.user.findUnique({
             where: { email },
         });
         if (existingUser) {
@@ -30,11 +39,11 @@ const sendOTP = async (req, res) => {
             specialChars: false,
         });
         // Delete any existing OTPs for this email
-        await prisma.oTP.deleteMany({
+        yield prisma.oTP.deleteMany({
             where: { email },
         });
         // Save new OTP
-        const otpDoc = await prisma.oTP.create({
+        const otpDoc = yield prisma.oTP.create({
             data: {
                 email,
                 otp,
@@ -42,7 +51,7 @@ const sendOTP = async (req, res) => {
             },
         });
         // Send email with the new template
-        await (0, mailSender_1.sendMail)({
+        yield (0, mailSender_1.sendMail)({
             email,
             subject: "Verify Your Email - StudyNotion",
             html: (0, emailTemplates_1.otpVerificationTemplate)(otp)
@@ -60,13 +69,13 @@ const sendOTP = async (req, res) => {
             error: error instanceof Error ? error.message : "Unknown error"
         });
     }
-};
+});
 exports.sendOTP = sendOTP;
-const verifyOTP = async (req, res) => {
+const verifyOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, otp } = req.body;
         // Find the most recent OTP for this email
-        const otpRecord = await prisma.oTP.findFirst({
+        const otpRecord = yield prisma.oTP.findFirst({
             where: {
                 email,
                 expiresAt: {
@@ -108,5 +117,5 @@ const verifyOTP = async (req, res) => {
             error: error instanceof Error ? error.message : "Unknown error"
         });
     }
-};
+});
 exports.verifyOTP = verifyOTP;
