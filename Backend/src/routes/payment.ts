@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { capturePayment, verifyPayment } from '../controllers/payment';
-import { authenticateUser } from '../middlewares/authMiddleware';
+import { authenticateUser } from '../Middlewares/authMiddleware';
 import { RequestHandler } from 'express';
 import { AuthRequest } from '../types/express';
 import { Response } from 'express';

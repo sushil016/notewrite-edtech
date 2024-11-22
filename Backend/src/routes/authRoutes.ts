@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { signup, login, verifyAuth } from '../controllers/auth';
 import { sendOTP, verifyOTP } from '../controllers/otpController';
 import { changePassword } from '../controllers/changePassword';
-import { authenticateUser } from '../middlewares/authMiddleware';
+import { authenticateUser } from '../Middlewares/authMiddleware';
 import { RequestHandler } from 'express';
 
 const router = Router();

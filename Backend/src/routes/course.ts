@@ -13,7 +13,7 @@ import {
   getCourseProgress,
   markVideoComplete
 } from '../controllers/course';
-import { authenticateUser, isTeacher } from '../middlewares/authMiddleware';
+import { authenticateUser, isTeacher } from '../Middlewares/authMiddleware';
 import { RequestHandler, Response, Request } from 'express';
 import { AuthRequest } from '../types/express';
 

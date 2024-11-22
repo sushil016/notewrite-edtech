@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createCategory, getAllCategories, getCategoryById } from '../controllers/category';
-import { authenticateUser, isTeacher } from '../middlewares/authMiddleware';
+import { authenticateUser, isTeacher } from '../Middlewares/authMiddleware';
 import { RequestHandler } from 'express';
 
 const router = Router();

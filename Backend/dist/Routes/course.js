@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const course_1 = require("../controllers/course");
-const authMiddleware_1 = require("../middlewares/authMiddleware");
+const authMiddleware_1 = require("../Middlewares/authMiddleware");
 const router = (0, express_1.Router)();
 // Type-safe wrapper for async handlers with Request
 const asyncHandler = (fn) => (req, res, next) => {

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateUser } from '../middlewares/authMiddleware';
+import { authenticateUser } from '../Middlewares/authMiddleware';
 
 const prisma = new PrismaClient();
 

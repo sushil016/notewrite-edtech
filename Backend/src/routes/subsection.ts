@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createSubSection, updateSubSection, deleteSubSection } from '../controllers/subsection';
-import { authenticateUser, isTeacher } from '../middlewares/authMiddleware';
+import { authenticateUser, isTeacher } from '../Middlewares/authMiddleware';
 import { RequestHandler } from 'express';
 import { AuthRequest } from '../types/express';
 import { Response } from 'express';

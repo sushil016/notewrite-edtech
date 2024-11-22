@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express'
-import { authenticateUser } from '../middlewares/authMiddleware'
-import { upload } from '../middlewares/multer'
+import { authenticateUser } from '../Middlewares/authMiddleware'
+import { upload } from '../Middlewares/multer'
 import {
   getUserProfile,
   updateProfile,

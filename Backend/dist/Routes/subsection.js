@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const subsection_1 = require("../controllers/subsection");
-const authMiddleware_1 = require("../middlewares/authMiddleware");
+const authMiddleware_1 = require("../Middlewares/authMiddleware");
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const fileSystem_1 = require("../utils/fileSystem");
