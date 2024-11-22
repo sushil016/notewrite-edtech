@@ -47,7 +47,7 @@ export const sendOTP: RequestHandler = async (req, res) => {
     // Send email with the new template
     await sendMail({
       email,
-      subject: "Verify Your Email - StudyNotion",
+      subject: "Verify Your Email - Notewrite",
       html: otpVerificationTemplate(otp)
     });
 

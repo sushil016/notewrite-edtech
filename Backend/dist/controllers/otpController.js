@@ -53,7 +53,7 @@ const sendOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Send email with the new template
         yield (0, mailSender_1.sendMail)({
             email,
-            subject: "Verify Your Email - StudyNotion",
+            subject: "Verify Your Email - Notewrite",
             html: (0, emailTemplates_1.otpVerificationTemplate)(otp)
         });
         res.status(200).json({

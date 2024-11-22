@@ -2,9 +2,6 @@ import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -25,7 +22,7 @@ export const sendMail = async (mailData: MailData) => {
         await transporter.verify();
         
         const info = await transporter.sendMail({
-            from: `"StudyNotion" <${process.env.SMTP_FROM}>`,
+            from: `"Notewrite" <${process.env.SMTP_FROM}>`,
             to: mailData.email,
             subject: mailData.subject,
             html: mailData.html,

@@ -18,6 +18,8 @@ const crypto_1 = __importDefault(require("crypto"));
 const mailSender_1 = require("../utils/mailSender");
 const emailTemplates_1 = require("../utils/emailTemplates");
 const app_1 = require("../app");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 // Check if required environment variables are present
 // if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_SECRET) {
 //     throw new Error('RAZORPAY_KEY_ID and RAZORPAY_SECRET must be present in environment variables');

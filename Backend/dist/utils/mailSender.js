@@ -16,9 +16,6 @@ exports.sendMail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -30,7 +27,7 @@ const sendMail = (mailData) => __awaiter(void 0, void 0, void 0, function* () {
         // Verify connection configuration
         yield transporter.verify();
         const info = yield transporter.sendMail({
-            from: `"StudyNotion" <${process.env.SMTP_FROM}>`,
+            from: `"Notewrite" <${process.env.SMTP_FROM}>`,
             to: mailData.email,
             subject: mailData.subject,
             html: mailData.html,
