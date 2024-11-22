@@ -21,6 +21,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={roboto.className} suppressHydrationWarning>
+      <head>
+        <meta httpEquiv="Content-Security-Policy" 
+          content="script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';" 
+        />
+      </head>
       <body 
         className="min-h-screen bg-[#0F172A]" 
         suppressHydrationWarning
