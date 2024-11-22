@@ -24,14 +24,23 @@ app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
     origin: [
-        process.env.FRONTEND_URL,
-        'http://localhost:3000', // For local development
-        // Add your deployed frontend URL here
+        'https://notewrite.sushilsahani.tech',
+        'http://localhost:3000'
     ],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'x-csrf-token'],
-    exposedHeaders: ['set-cookie'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'Cookie',
+        'Origin',
+        'Accept',
+        'X-Requested-With',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers'
+    ],
+    exposedHeaders: ['Set-Cookie'],
+    maxAge: 86400, // 24 hours in seconds
 }));
 app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
 // Add request logging middleware
@@ -69,4 +78,12 @@ app.use((err, req, res, next) => {
     console.error('Error:', err);
     res.status(err.status || 500).json(Object.assign({ success: false, message: err.message || 'Internal server error' }, (process.env.NODE_ENV === 'development' && { stack: err.stack })));
 });
+// Add security headers middleware
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://notewrite.sushilsahani.tech');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
+// Add this before your routes
+app.options('*', (0, cors_1.default)()); // Enable pre-flight for all routes
 exports.default = app;
