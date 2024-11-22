@@ -38,7 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const app_1 = __importStar(require("./app"));
 dotenv_1.default.config();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT;
 // Database connection and server start
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
