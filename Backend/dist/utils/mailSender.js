@@ -18,16 +18,16 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 // Validate environment variables at startup
 const validateConfig = () => {
-    const required = ['SMTP_USER', 'SMTP_PASS', 'SMTP_FROM'];
+    const required = ['EMAIL_USER', 'EMAIL_PASS', 'SMTP_FROM'];
     const missing = required.filter(key => !process.env[key]);
     if (missing.length) {
         throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
     }
     // Log config (without sensitive data) for debugging
     console.log('Email Configuration:', {
-        user: process.env.SMTP_USER,
+        user: process.env.EMAIL_USER,
         from: process.env.SMTP_FROM,
-        hasPassword: !!process.env.SMTP_PASS
+        hasPassword: !!process.env.EMAIL_PASS
     });
 };
 // Create transporter with more detailed configuration
@@ -36,8 +36,8 @@ const createTransporter = () => {
     return nodemailer_1.default.createTransport({
         service: 'gmail',
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
         },
         debug: true,
         logger: true, // Enable built-in logger
