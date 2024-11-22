@@ -19,10 +19,14 @@ export const prisma = new PrismaClient();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://notewrite-pnr1tra3.b4a.run',
+  origin: [
+    process.env.FRONTEND_URL,
+    'http://localhost:3000',  // For local development
+    // Add your deployed frontend URL here
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'x-csrf-token'],
   exposedHeaders: ['set-cookie'],
 }));
 

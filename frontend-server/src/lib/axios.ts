@@ -3,11 +3,11 @@ import Cookies from 'js-cookie';
 import { API_BASE_URL } from '@/config/api';
 
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL || 'http://localhost:8000/api/v1',
+  baseURL: process.env.API_BASE_URL || 'https://notewrite-pnr1tra3.b4a.run',
+  withCredentials: true,  // Important for CORS with credentials
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Important for cross-site requests
 });
 
 // Response interceptor
