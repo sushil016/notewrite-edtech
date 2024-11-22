@@ -75,7 +75,7 @@ export function Navbar() {
     return (
       <Link href="/login">
         <MovingButton
-          borderRadius="1rem"
+          borderradius="1rem"
           className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
         >
           <span>Login</span>

@@ -1,29 +1,34 @@
-import { Testimonial } from '@/types/testimonial';
-import { StarRating } from '@/components/common/StarRating';
 import Image from 'next/image';
+import { Testimonial } from '@/types/testimonial';
+import { StarRating } from '../common/StarRating';
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
 }
 
-export const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial }) => (
-  <div className="w-80 flex-shrink-0 mx-2">
-    <div className="bg-zinc-950 rounded-lg shadow-lg p-6 h-full flex flex-col justify-between">
-      <div>
-        <div className="flex items-center mb-4">
+const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
+  return (
+    <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 shadow-xl">
+      <div className="flex items-center mb-4">
+        <div className="relative w-12 h-12 mr-4">
           <Image
-            src={testimonial.photo}
-            alt={testimonial.name}
-            className="w-12 h-12 rounded-full mr-4"
+            src={testimonial.image || '/assets/default-avatar.png'}
+            alt={`${testimonial.name}'s profile`}
+            width={48}
+            height={48}
+            className="rounded-full object-cover w-12 h-12"
+            priority
           />
-          <div>
-            <h3 className="text-lg font-semibold text-blue-300">{testimonial.name}</h3>
-            <p className="text-sm text-gray-400">{testimonial.course}</p>
-          </div>
         </div>
-        <p className="text-gray-300 mb-4 text-sm italic">{testimonial.quote}</p>
+        <div>
+          <h3 className="text-lg font-semibold text-white">{testimonial.name}</h3>
+          <p className="text-sm text-gray-400">{testimonial.role}</p>
+        </div>
       </div>
-      <StarRating rating={testimonial.rating} size="sm" />
+      <StarRating rating={testimonial.rating} />
+      <p className="mt-4 text-gray-300">{testimonial.comment}</p>
     </div>
-  </div>
-);
+  );
+};
+
+export default TestimonialCard;

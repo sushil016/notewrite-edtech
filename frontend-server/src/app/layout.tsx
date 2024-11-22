@@ -16,17 +16,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en">
-      <body className={roboto.className}>
+    <html lang="en" className={roboto.className} suppressHydrationWarning>
+      <body 
+        className="min-h-screen bg-[#0F172A]" 
+        suppressHydrationWarning
+      >
         <Providers>
           <Navbar/>            
-          {children}          
+          <main>{children}</main>          
           <Footer />
-         
         </Providers>
       </body>
     </html>

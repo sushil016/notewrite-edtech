@@ -42,21 +42,35 @@ export function LoginForm() {
         throw new Error("Please fill in all fields");
       }
 
-      const response = await login(formData.email, formData.password);
+      console.log('Attempting login with:', { 
+        email: formData.email, 
+        password: '***' 
+      });
 
-      if (response.success) {
+      const response = await login(formData.email, formData.password);
+      
+      console.log('Login response:', response);
+
+      if (response.success && response.user) {
         switch (response.user.accountType) {
           case 'ADMIN':
           case 'TEACHER':
-            router.push('/');
+            router.push('/teacher/dashboard');
             break;
           case 'STUDENT':
           default:
             router.push('/');
         }
+      } else {
+        throw new Error("Login failed - Invalid credentials");
       }
     } catch (error: any) {
-      setError(error.message || "Failed to login");
+      console.error('Login error:', error);
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError(error.message || "Failed to login. Please check your credentials.");
+      }
     } finally {
       setLoading(false);
     }
