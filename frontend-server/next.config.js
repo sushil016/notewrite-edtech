@@ -27,6 +27,16 @@ const nextConfig = {
   },
   reactStrictMode: true,
   swcMinify: true,
+  experimental: {
+    forceSwcTransforms: true,
+  },
+  compiler: {
+    styledComponents: true
+  },
+  webpack: (config, { isServer }) => {
+    // Add any custom webpack config here if needed
+    return config;
+  },
 }
 
 module.exports = nextConfig 
