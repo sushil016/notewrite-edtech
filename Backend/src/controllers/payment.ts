@@ -6,6 +6,8 @@ import { sendMail } from '../utils/mailSender';
 import { courseEnrollmentTemplate } from '../utils/emailTemplates';
 import { AuthRequest } from '../types/express';
 import { prisma } from '../app';
+import dotenv from 'dotenv'
+dotenv.config();
 
 interface RazorpayOrderOptions {
     amount: number;
@@ -53,8 +55,8 @@ type VerifyPaymentRequest = AuthRequest & { body: VerifyPaymentBody };
 
 // Initialize Razorpay with type assertion
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID as string,
-    key_secret: process.env.RAZORPAY_SECRET as string
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_SECRET
 });
 
 export const capturePayment = async (req: CapturePaymentRequest, res: Response): Promise<void> => {
