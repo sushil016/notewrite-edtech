@@ -1,13 +1,23 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { API_BASE_URL } from '@/config/api';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://notewrite-pnr1tra3.b4a.run/api/v1',
-  withCredentials: true,  // Important for CORS with credentials
+  baseURL: 'https://notewrite-pnr1tra3.b4a.run/api/v1',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Origin': 'https://notewrite.sushilsahani.tech'
   },
+});
+
+// Request interceptor
+axiosInstance.interceptors.request.use((config) => {
+  const token = Cookies.get('token') || localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Response interceptor
