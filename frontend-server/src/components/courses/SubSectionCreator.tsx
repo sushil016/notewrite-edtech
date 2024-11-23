@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import axiosInstance from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import { FaFileUpload } from 'react-icons/fa';
+import { LoadingButton } from '../ui/loading-button';
 
 const subSectionSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -30,6 +31,11 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
   const [sections, setSections] = useState<Array<{ id: string; sectionName: string }>>([]);
   const [selectedSection, setSelectedSection] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log('actionLoading:', actionLoading);
+  }, [actionLoading]);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<SubSectionFormData>({
     resolver: zodResolver(subSectionSchema)
@@ -96,9 +102,9 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
     return (
       <div className="text-center text-white">
         <p>No sections found. Please create a section first.</p>
-        <MovingButton onClick={() => window.history.back()} className="mt-4">
+        <LoadingButton onClick={() => window.history.back()} className="mt-4">
           Go Back
-        </MovingButton>
+        </LoadingButton>
       </div>
     );
   }
@@ -193,14 +199,17 @@ export function SubSectionCreator({ courseId, onComplete }: SubSectionCreatorPro
         </div>
 
         <div className="flex justify-between">
-          <MovingButton type="submit">Add Subsection</MovingButton>
-          <MovingButton 
+          <LoadingButton type="submit"
+          isLoading={actionLoading === 'subsection'}
+          loadingText="Adding..."
+          >Add Subsection</LoadingButton>
+          <LoadingButton 
             type="button" 
             onClick={() => router.push(`/teacher/courses/${courseId}/review`)} 
             variant="outline"
           >
             Review Course
-          </MovingButton>
+          </LoadingButton>
         </div>
       </form>
     </div>

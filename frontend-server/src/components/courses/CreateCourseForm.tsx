@@ -13,6 +13,7 @@ import { SectionCreator } from './SectionCreator';
 import { SubSectionCreator } from './SubSectionCreator';
 import { IoMdAdd, IoMdClose } from 'react-icons/io';
 import axiosInstance from '@/lib/axios';
+import { LoadingButton } from '../ui/loading-button';
 
 const courseSchema = z.object({
   courseName: z.string().min(3, 'Course name must be at least 3 characters'),
@@ -44,6 +45,11 @@ export default function CreateCourseForm() {
   const [tags, setTags] = useState<string[]>([]);
   const [newInstruction, setNewInstruction] = useState('');
   const [instructions, setInstructions] = useState<string[]>([]);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  useEffect(() => {
+    console.log('actionLoading:', actionLoading);
+  }, [actionLoading]);
+
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<CourseFormData>({
     resolver: zodResolver(courseSchema)
@@ -207,9 +213,12 @@ export default function CreateCourseForm() {
                     placeholder="Enter a tag"
                     className="bg-white/5 border-gray-700 text-white flex-1"
                   />
-                  <MovingButton type="button" onClick={handleAddTag}>
+                  <LoadingButton type="button" 
+                  isLoading={actionLoading === 'tag'}
+                  loadingText="Adding..."
+                  onClick={handleAddTag}>
                     <IoMdAdd className="w-5 h-5" />
-                  </MovingButton>
+                  </LoadingButton>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag, index) => (
@@ -242,9 +251,12 @@ export default function CreateCourseForm() {
                     placeholder="Enter an instruction"
                     className="bg-white/5 border-gray-700 text-white flex-1"
                   />
-                  <MovingButton type="button" onClick={handleAddInstruction}>
+                  <LoadingButton type="button" 
+                  isLoading={actionLoading === 'instruction'}
+                  loadingText="Adding..."
+                  onClick={handleAddInstruction}>
                     <IoMdAdd className="w-5 h-5" />
-                  </MovingButton>
+                  </LoadingButton>
                 </div>
                 <div className="space-y-2">
                   {instructions.map((instruction, index) => (
@@ -269,9 +281,12 @@ export default function CreateCourseForm() {
               </div>
 
               <div className="pt-6">
-                <MovingButton type="submit" className="w-full">
+                <LoadingButton type="submit" className="w-full"
+                isLoading={actionLoading === 'submit'}
+                loadingText="Submitting..."
+                >
                   Continue to Sections
-                </MovingButton>
+                </LoadingButton>
               </div>
             </form>
           </div>

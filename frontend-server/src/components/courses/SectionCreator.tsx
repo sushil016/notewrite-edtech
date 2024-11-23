@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -7,6 +7,7 @@ import { MovingButton } from '@/components/ui/moving-border'
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import axiosInstance from '@/lib/axios';
+import { LoadingButton } from '../ui/loading-button';
 
 const sectionSchema = z.object({
   sectionName: z.string().min(3, 'Section name must be at least 3 characters'),
@@ -21,10 +22,13 @@ interface SectionCreatorProps {
 
 export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
   const [sections, setSections] = useState<Array<{ id: string; sectionName: string }>>([]);
-
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<SectionFormData>({
     resolver: zodResolver(sectionSchema)
   });
+  useEffect(() => {
+    console.log('actionLoading:', actionLoading);
+  }, [actionLoading]);
 
   const onSubmit = async (data: SectionFormData) => {
     try {
@@ -59,7 +63,10 @@ export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
           )}
         </div>
 
-        <MovingButton type="submit">Add Section</MovingButton>
+        <LoadingButton type="submit"
+        isLoading={actionLoading === 'section'}
+        loadingText="Adding..."
+        >Add Section</LoadingButton>
       </form>
 
       <div className="mt-6">
@@ -70,7 +77,7 @@ export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
             className="p-4 border border-gray-700 rounded-lg mb-3 flex justify-between items-center bg-white/5 text-white"
           >
             <span>{section.sectionName}</span>
-            <MovingButton
+            <LoadingButton
               variant="outline"
               size="sm"
               onClick={() => {
@@ -78,18 +85,20 @@ export function SectionCreator({ courseId, onComplete }: SectionCreatorProps) {
               }}
             >
               Edit
-            </MovingButton>
+            </LoadingButton>
           </div>
         ))}
       </div>
 
       {sections.length > 0 && (
-        <MovingButton
+        <LoadingButton
           onClick={onComplete}
           className="mt-6"
+          isLoading={actionLoading === 'continue'}
+          loadingText="Continuing..."
         >
           Continue to Add Content
-        </MovingButton>
+        </LoadingButton>
       )}
     </div>
   );
