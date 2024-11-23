@@ -77,8 +77,8 @@ export function Signup() {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-2 md:p-8 backdrop-blur-sm shadow-lg shadow-zinc-100/10 drop-shadow-xs relative">
-      <Heading value={'Welcome to Robonauts'} />
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-2 md:p-8 md:pt-8 md:mt-24 mb-8 mt-0 backdrop-blur-sm shadow-lg shadow-zinc-100/40 drop-shadow-xs relative">
+      <Heading value={'Welcome to NoteWrite'} />
       <SubHeading value={'Enter your Credentials to create your account!'} />
 
       <form className="my-8" onSubmit={handleSubmit}>
@@ -146,7 +146,6 @@ export function Signup() {
             required
           >
             <option value="STUDENT">Student</option>
-            <option value="TEACHER">Teacher</option>
           </select>
         </LabelInputContainer>
 

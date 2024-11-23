@@ -1,14 +1,13 @@
 "use client";
 import React from "react";
 import { HoverBorderGradient } from "../ui/hover-border-gradient";
-import { Router } from "next/router";
-import Link from "next/link";
 interface StylisButtonProps {
-  text: string;
-  onClick?: () => void; // Add this line to accept onClick prop
+  text: string | React.ReactNode;
+  onClick?: () => void; 
+  disabled?: boolean;
 }
 
-export function StylisButton({text,onClick}:StylisButtonProps) {
+export const StylisButton: React.FC<StylisButtonProps> = ({ onClick, text, disabled }) => {
  
   return (
     <div className=" flex justify-center text-center">
@@ -16,11 +15,11 @@ export function StylisButton({text,onClick}:StylisButtonProps) {
       
         containerClassName="rounded-full"
         as="button"
-        className="dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2 mx-3"
+        className={`dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2 mx-3 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         onClick={onClick}
       >
        
-        <span>{text}</span>
+       {text}
       </HoverBorderGradient>
     </div>
   );

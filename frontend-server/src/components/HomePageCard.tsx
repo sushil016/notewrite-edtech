@@ -10,20 +10,20 @@ import CommunityForum from './features/CommunityForum';
 
 interface DataPoint {
   name: string;
-  Critical: number;
-  High: number;
-  Moderate: number;
-  Low: number;
+  Courses: number;
+  Documentation: number;
+  Projects: number;
+  Resources: number;
   [key: string]: string | number; // Index signature
 }
 
 const data: DataPoint[] = [
-  { name: 'Jan', Critical: 4, High: 8, Moderate: 15, Low: 20 },
-  { name: 'Feb', Critical: 3, High: 10, Moderate: 12, Low: 22 },
-  { name: 'Mar', Critical: 5, High: 7, Moderate: 18, Low: 18 },
-  { name: 'Apr', Critical: 2, High: 12, Moderate: 14, Low: 24 },
-  { name: 'May', Critical: 6, High: 9, Moderate: 16, Low: 19 },
-  { name: 'Jun', Critical: 4, High: 11, Moderate: 13, Low: 21 },
+  { name: 'Jan', Courses: 4, Documentation: 8, Projects: 15, Resources: 20 },
+  { name: 'Feb', Courses: 3, Documentation: 10, Projects: 12, Resources: 22 },
+  { name: 'Mar', Courses: 5, Documentation: 7, Projects: 18, Resources: 18 },
+  { name: 'Apr', Courses: 2, Documentation: 12, Projects: 14, Resources: 24 },
+  { name: 'May', Courses: 6, Documentation: 9, Projects: 16, Resources: 19 },
+  { name: 'Jun', Courses: 4, Documentation: 11, Projects: 13, Resources: 21 },
 ];
 
 const tabs = [
@@ -72,7 +72,7 @@ const HomePageCard = () => {
           <div className="relative z-10 space-y-8 p-6">
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {['Critical', 'High', 'Moderate', 'Low'].map((severity) => (
+              {['Courses', 'Documentation', 'Projects', 'Resources'].map((severity) => (
                 <div 
                   key={severity} 
                   className="text-center p-4 bg-gray-900/50 rounded-lg border border-gray-800"

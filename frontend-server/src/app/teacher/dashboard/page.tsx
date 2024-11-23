@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { MovingButton } from '@/components/ui/moving-border';
 import axiosInstance from '@/lib/axios';
+import { LoadingButton } from '@/components/ui/loading-button';
 
 interface Course {
   id: string;
@@ -16,11 +17,28 @@ interface Course {
 export default function TeacherDashboard() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     fetchCourses();
   }, []);
+
+  useEffect(() => {
+    console.log('actionLoading:', actionLoading);
+  }, [actionLoading]);
+
+  const handleNavigation = async (path: string, action: string) => {
+    setActionLoading(action);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await router.replace(path);
+    } catch (error) {
+      console.error('Navigation error:', error);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const fetchCourses = async () => {
     try {
@@ -42,15 +60,27 @@ export default function TeacherDashboard() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
             <div className="flex gap-4">
-            <MovingButton onClick={() => router.push('/teacher/createCategory')}>
+            <LoadingButton
+                isLoading={actionLoading === 'category'}
+                loadingText="Creating..."
+                onClick={() => handleNavigation('/teacher/createCategory', 'category')}
+              >
                 Create New Category
-              </MovingButton>
-              <MovingButton onClick={() => router.push('/teacher/my-courses')}>
+              </LoadingButton>
+              <LoadingButton
+                isLoading={actionLoading === 'review'}
+                loadingText="Loading..."
+                onClick={() => handleNavigation('/teacher/my-courses', 'review')}
+              >
                 Edit / Review Courses
-              </MovingButton>
-              <MovingButton onClick={() => router.push('/teacher/createCourse')}>
+              </LoadingButton>
+              <LoadingButton
+                isLoading={actionLoading === 'create'}
+                loadingText="Creating..."
+                onClick={() => handleNavigation('/teacher/createCourse', 'create')}
+              >
                 Create New Course
-              </MovingButton>
+              </LoadingButton>
            
             </div>
           </div>

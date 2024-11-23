@@ -10,6 +10,7 @@ import ThemeSwitch from "./ThemeSwitch";
 import { UserDropdown } from "./ui/UserDropdown";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
+import { Spinner } from "./ui/Spinner";
 
 const menuVariants = {
   closed: {
@@ -33,6 +34,7 @@ export function Navbar() {
   const { user, isAuthenticated, logout, initialize } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Debug logs
   useEffect(() => {
@@ -73,12 +75,26 @@ export function Navbar() {
 
     // Show login button immediately if not authenticated and not loading
     return (
-      <Link href="/login">
+      <Link href="/login" onClick={(e) => {
+        if (isLoading) {
+          e.preventDefault();
+        }
+      }}>
         <MovingButton
           borderradius="1rem"
-          className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
+          className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800 disabled:opacity-70"
+          disabled={isLoading}
         >
-          <span>Login</span>
+          <span className="flex items-center gap-2">
+            {isLoading ? (
+              <>
+                <Spinner size="sm" />
+                <span>Loading...</span>
+              </>
+            ) : (
+              'Login'
+            )}
+          </span>
         </MovingButton>
       </Link>
     );

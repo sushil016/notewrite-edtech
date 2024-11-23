@@ -34,7 +34,7 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="flex justify-center items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-600">
+    <main className="flex justify-center items-center min-h-screen bg-gradient-to-b from-gray-800 to-gray-900">
       <Signup />
     </main>
   );
