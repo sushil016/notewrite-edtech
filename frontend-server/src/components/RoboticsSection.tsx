@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { motion, useAnimation, AnimationControls } from 'framer-motion'
 import DocumentationCard from './DocumentationCard'
 import CourseCard from './CourseCard'
+import router from 'next/router'
+import { redirect } from 'next/navigation'
 
 interface DocumentationItem {
   title: string;
@@ -68,6 +70,7 @@ export default function RoboticsSection() {
             whileTap={{ scale: 0.95 }}
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
+            onClick={() => redirect('https://robonauts-one.vercel.app/')}
           >
             Explore All Documentation
           </motion.button>
@@ -85,6 +88,7 @@ export default function RoboticsSection() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             animate={ctaControls}
+            onClick={() => redirect('https://robonauts-one.vercel.app/')}
           >
             Enroll Now
           </motion.button>

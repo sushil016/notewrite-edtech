@@ -52,19 +52,19 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-12">
         {/* Brand Section */}
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold text-blue-400">@Robonauts</h2>
+          <h2 className="text-3xl font-bold text-blue-400">@Notewrite</h2>
           <p className="text-gray-400">An Edtech platform for Engineering college</p>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <FaEnvelope className="text-blue-400" />
-              <a href="mailto:support@robonauts.edu" className="text-gray-400 hover:text-white">
-                support@robonauts.edu
+              <a href="mailto:support@notewrite.com" className="text-gray-400 hover:text-white">
+                support@notewrite.com
               </a>
             </div>
             <div className="flex items-center gap-2">
               <FaPhone className="text-blue-400" />
-              <a href="tel:+1234567890" className="text-gray-400 hover:text-white">
-                +1 (234) 567-890
+              <a href="tel:+917007115675" className="text-gray-400 hover:text-white">
+                +91 7007115675
               </a>
             </div>
           </div>
@@ -74,10 +74,18 @@ const Footer = () => {
         <div className="space-y-4">
           <Heading value="Catalog" />
           <ul className="space-y-2">
-            <li className="text-gray-400 hover:text-white cursor-pointer">College Works</li>
-            <li className="text-gray-400 hover:text-white cursor-pointer">Web Development</li>
-            <li className="text-gray-400 hover:text-white cursor-pointer">Mobile Development</li>
-            <li className="text-gray-400 hover:text-white cursor-pointer">AI & Machine Learning</li>
+            <li onClick={() => navigate.push('/catalog/college-works')} className="text-gray-400 hover:text-white cursor-pointer">
+              College Works
+            </li>
+            <li onClick={() => navigate.push('/catalog/web-development')} className="text-gray-400 hover:text-white cursor-pointer">
+              Web Development
+            </li>
+            <li onClick={() => navigate.push('/catalog/mobile-development')} className="text-gray-400 hover:text-white cursor-pointer">
+              Mobile Development
+            </li>
+            <li onClick={() => navigate.push('/catalog/ai-machine-learning')} className="text-gray-400 hover:text-white cursor-pointer">
+              AI & Machine Learning
+            </li>
           </ul>
         </div>
 
@@ -141,10 +149,10 @@ const Footer = () => {
               <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-white">Terms of Service</Link>
               <Link href="/faq" className="hover:text-white">FAQ</Link>
-              <Link href="/careers" className="hover:text-white">Careers</Link>
+              <Link href="/refund" className="hover:text-white">Refund/Cancellation Policy</Link>
             </div>
             <div className="text-sm text-gray-400">
-              Copyright © 2024 Robonauts. All rights reserved.
+              Copyright © 2024 Notewrite. All rights reserved.
             </div>
           </div>
         </div>

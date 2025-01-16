@@ -129,13 +129,13 @@ export function Navbar() {
             onClick={() => router.push("/services")}
             className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150"
           >
-            Services
+            Robonauts Services
           </button>
           <button
             onClick={() => router.push("/courses")}
             className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150"
           >
-            Courses
+           Our Courses
           </button>
           <button
             onClick={() => router.push("/contact")}
@@ -203,7 +203,7 @@ export function Navbar() {
                 }}
                 className="text-zinc-300 hover:text-blue-400 hover:scale-105 transform duration-150"
               >
-                Services
+                Robonauts Services
               </button>
               <button
                 onClick={() => {
